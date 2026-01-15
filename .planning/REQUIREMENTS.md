@@ -63,23 +63,23 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CAM-01 | TBD | Pending |
-| CAM-02 | TBD | Pending |
-| CAM-03 | TBD | Pending |
-| CAM-04 | TBD | Pending |
-| POSE-01 | TBD | Pending |
-| POSE-02 | TBD | Pending |
-| POSE-03 | TBD | Pending |
-| POSE-04 | TBD | Pending |
-| REC-01 | TBD | Pending |
-| REC-02 | TBD | Pending |
-| AUTH-01 | TBD | Pending |
+| CAM-01 | Phase 1 | Pending |
+| CAM-02 | Phase 1 | Pending |
+| CAM-03 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| POSE-01 | Phase 2 | Pending |
+| POSE-02 | Phase 2 | Pending |
+| CAM-04 | Phase 2 | Pending |
+| REC-01 | Phase 3 | Pending |
+| REC-02 | Phase 3 | Pending |
+| POSE-03 | Phase 4 | Pending |
+| POSE-04 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11 (pending roadmap creation)
+- Mapped to phases: 11
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-15*
-*Last updated: 2026-01-15 after initial definition*
+*Last updated: 2026-01-15 after roadmap creation*

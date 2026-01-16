@@ -2,6 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Landmark } from '../types/pose';
 import { PostureAlert, checkGeneralPosture } from '../utils/postureRules';
 import { SquatFormAlert, checkSquatForm, isSquatPosition } from '../utils/squatRules';
+import {
+  PushupFormAlert,
+  checkPushupForm,
+  isPushupPosition,
+} from '../utils/pushupRules';
 
 // Debounce time before showing alert (avoid flicker)
 const ALERT_DEBOUNCE_MS = 500;
@@ -14,7 +19,7 @@ const BEEP_VOLUME = 0.3;
 
 export type ExerciseMode = 'general' | 'squat' | 'pushup';
 
-type ExerciseAlert = PostureAlert | SquatFormAlert;
+export type ExerciseAlert = PostureAlert | SquatFormAlert | PushupFormAlert;
 
 interface UseExerciseAlertsReturn {
   currentAlert: ExerciseAlert | null;
@@ -115,9 +120,17 @@ export function useExerciseAlerts(
         }
       }
       case 'pushup': {
-        // Placeholder for Plan 02 - use general posture for now
-        setIsExercising(false);
-        return checkGeneralPosture(landmarks);
+        // Check if in push-up position
+        const inPushupPosition = isPushupPosition(landmarks);
+        setIsExercising(inPushupPosition);
+
+        if (inPushupPosition) {
+          // In push-up - check push-up-specific form
+          return checkPushupForm(landmarks);
+        } else {
+          // Between reps - check general posture
+          return checkGeneralPosture(landmarks);
+        }
       }
       case 'general':
       default: {

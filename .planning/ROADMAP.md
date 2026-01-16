@@ -15,7 +15,7 @@ None
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Foundation** - Camera access, responsive UI, password protection
-- [ ] **Phase 2: Pose Detection** - Skeleton overlay and general posture alerts
+- [x] **Phase 2: Pose Detection** - Skeleton overlay and general posture alerts
 - [ ] **Phase 3: Recording** - Video capture and local download
 - [ ] **Phase 4: Exercise Alerts** - Squat and push-up form detection
 
@@ -42,7 +42,7 @@ Plans:
 
 Plans:
 - [x] 02-01: MediaPipe integration and skeleton drawing
-- [ ] 02-02: General posture detection and audio/visual alerts
+- [x] 02-02: General posture detection and audio/visual alerts
 
 ### Phase 3: Recording
 **Goal**: Video recording with local download
@@ -75,6 +75,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-01-16 |
-| 2. Pose Detection | 1/2 | In progress | - |
+| 2. Pose Detection | 2/2 | Complete | 2026-01-16 |
 | 3. Recording | 0/2 | Not started | - |
 | 4. Exercise Alerts | 0/2 | Not started | - |

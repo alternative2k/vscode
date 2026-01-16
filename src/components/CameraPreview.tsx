@@ -145,19 +145,35 @@ export function CameraPreview() {
             Squat
           </button>
           <button
-            disabled
-            className="px-3 py-1 text-xs font-medium rounded-full text-gray-500 cursor-not-allowed"
-            title="Coming soon"
+            onClick={() => setExerciseMode('pushup')}
+            className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+              exerciseMode === 'pushup'
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-300 hover:text-white'
+            }`}
           >
             Push-up
           </button>
         </div>
 
-        {/* Squat detected indicator */}
+        {/* Exercise detected indicator */}
         {exerciseMode === 'squat' && isExercising && (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-purple-500/80 text-white">
             <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
             Squat detected
+          </div>
+        )}
+        {exerciseMode === 'pushup' && isExercising && (
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-purple-500/80 text-white">
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            Push-up detected
+          </div>
+        )}
+
+        {/* Camera positioning hint for push-up mode */}
+        {exerciseMode === 'pushup' && !isExercising && (
+          <div className="text-xs text-gray-400 text-right max-w-[140px]">
+            Best results from side view
           </div>
         )}
       </div>

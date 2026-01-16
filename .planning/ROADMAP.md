@@ -7,7 +7,7 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 ## Milestones
 
 - ✅ **v1.0 MVP** - [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) (Phases 1-4, shipped 2026-01-16)
-- 🚧 **v1.1 Recording History** - Phase 5 (in progress)
+- ✅ **v1.1 Recording History** - Phase 5 (complete)
 
 ## Completed Milestones
 
@@ -21,7 +21,7 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 
 </details>
 
-### 🚧 v1.1 Recording History (In Progress)
+### ✅ v1.1 Recording History (Complete)
 
 **Milestone Goal:** Local recording management with IndexedDB persistence — view past recordings and delete to free space.
 
@@ -34,7 +34,7 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 
 Plans:
 - [x] 05-01: Storage Foundation — IndexedDB utils, extended types, useRecordingHistory hook
-- [ ] 05-02: UI Integration — RecordingList component, app integration (depends: 05-01)
+- [x] 05-02: UI Integration — RecordingList component, app integration (depends: 05-01)
 
 ## Progress
 
@@ -44,4 +44,4 @@ Plans:
 | 2. Pose Detection | v1.0 | 2/2 | Complete | 2026-01-16 |
 | 3. Recording | v1.0 | 2/2 | Complete | 2026-01-16 |
 | 4. Exercise Alerts | v1.0 | 2/2 | Complete | 2026-01-16 |
-| 5. Recording History | v1.1 | 1/2 | In progress | - |
+| 5. Recording History | v1.1 | 2/2 | Complete | 2026-01-16 |

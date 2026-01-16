@@ -23,8 +23,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Recording
 
-- [ ] **REC-01**: User can start and stop video recording
-- [ ] **REC-02**: User can download recorded video to local device
+- [x] **REC-01**: User can start and stop video recording
+- [x] **REC-02**: User can download recorded video to local device
 
 ### Authentication
 
@@ -70,8 +70,8 @@ Which phases cover which requirements. Updated by create-roadmap.
 | POSE-01 | Phase 2 | Complete |
 | POSE-02 | Phase 2 | Complete |
 | CAM-04 | Phase 2 | Complete |
-| REC-01 | Phase 3 | Pending |
-| REC-02 | Phase 3 | Pending |
+| REC-01 | Phase 3 | Complete |
+| REC-02 | Phase 3 | Complete |
 | POSE-03 | Phase 4 | Pending |
 | POSE-04 | Phase 4 | Pending |
 
@@ -82,4 +82,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-15*
-*Last updated: 2026-01-16 after Phase 2 completion*
+*Last updated: 2026-01-16 after Phase 3 completion*

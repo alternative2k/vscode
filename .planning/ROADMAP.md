@@ -8,6 +8,7 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 
 - ✅ **v1.0 MVP** - [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) (Phases 1-4, shipped 2026-01-16)
 - ✅ **v1.1 Recording History** - [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) (Phase 5, shipped 2026-01-16)
+- 🚧 **v2.0 Cloud Backup** - Phase 6 (in progress)
 
 ## Completed Milestones
 
@@ -28,6 +29,21 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 
 </details>
 
+### 🚧 v2.0 Cloud Backup (In Progress)
+
+**Milestone Goal:** Enable cloud backup of recordings to S3 with robust upload handling
+
+#### Phase 6: S3 Upload
+
+**Goal**: Direct browser-to-S3 uploads with progress UI and retry logic
+**Depends on**: Phase 5 (Recording History)
+**Research**: Likely (AWS S3 browser SDK, CORS configuration for public bucket)
+**Research topics**: AWS SDK for browser, S3 CORS setup, presigned URLs vs public bucket
+**Plans**: TBD
+
+Plans:
+- [ ] 06-01: TBD (run /gsd:plan-phase 6 to break down)
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -37,3 +53,4 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 | 3. Recording | v1.0 | 2/2 | Complete | 2026-01-16 |
 | 4. Exercise Alerts | v1.0 | 2/2 | Complete | 2026-01-16 |
 | 5. Recording History | v1.1 | 2/2 | Complete | 2026-01-16 |
+| 6. S3 Upload | v2.0 | 0/? | Not started | - |

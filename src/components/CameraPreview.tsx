@@ -2,13 +2,22 @@ import { useEffect, useState, useCallback } from 'react';
 import { useCamera } from '../hooks/useCamera';
 import { usePoseDetection } from '../hooks/usePoseDetection';
 import { usePostureAlerts } from '../hooks/usePostureAlerts';
+import { useRecording } from '../hooks/useRecording';
 import { PoseCanvas } from './PoseCanvas';
 import { AlertOverlay } from './AlertOverlay';
+
+// Format seconds to MM:SS display
+function formatDuration(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
 
 export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
   const { landmarks, isDetecting } = usePoseDetection(videoRef, facingMode);
   const { currentAlert } = usePostureAlerts(landmarks);
+  const { state: recordingState, duration, startRecording, stopRecording } = useRecording(stream);
 
   // Track video dimensions for canvas sizing
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
@@ -114,6 +123,58 @@ export function CameraPreview() {
           {isDetecting && landmarks ? 'Tracking' : 'Initializing...'}
         </div>
       </div>
+
+      {/* Recording indicator at top-right */}
+      {recordingState === 'recording' && (
+        <div className="absolute top-4 right-4">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-red-600/90 text-white">
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            <span>REC</span>
+            <span className="font-mono">{formatDuration(duration)}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Recording control button - bottom-left (opposite of camera switch) */}
+      <button
+        onClick={recordingState === 'recording' ? stopRecording : startRecording}
+        className={`absolute bottom-6 left-4 md:bottom-4 p-3 rounded-full transition-colors shadow-lg ${
+          recordingState === 'recording'
+            ? 'bg-red-600/90 hover:bg-red-500/90 active:bg-red-400/90'
+            : 'bg-gray-800/80 hover:bg-gray-700/90 active:bg-gray-600/90'
+        } text-white`}
+        style={{ minWidth: '48px', minHeight: '48px' }}
+        aria-label={recordingState === 'recording' ? 'Stop recording' : 'Start recording'}
+        title={recordingState === 'recording' ? 'Stop recording' : 'Start recording'}
+      >
+        {recordingState === 'idle' && (
+          // White circle icon - ready to record
+          <div className="w-6 h-6 flex items-center justify-center">
+            <div className="w-5 h-5 rounded-full bg-white" />
+          </div>
+        )}
+        {recordingState === 'recording' && (
+          // Red pulsing square with duration - stop recording
+          <div className="w-6 h-6 flex items-center justify-center">
+            <div className="w-4 h-4 rounded-sm bg-white animate-pulse" />
+          </div>
+        )}
+        {recordingState === 'stopped' && (
+          // Checkmark icon - recording complete
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              fillRule="evenodd"
+              d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z"
+              clipRule="evenodd"
+            />
+          </svg>
+        )}
+      </button>
 
       {/* Camera switch button - positioned for thumb reach on mobile */}
       <button

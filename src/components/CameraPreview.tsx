@@ -1,8 +1,24 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useCamera } from '../hooks/useCamera';
+import { usePoseDetection } from '../hooks/usePoseDetection';
+import { PoseCanvas } from './PoseCanvas';
 
 export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
+  const { landmarks, isDetecting } = usePoseDetection(videoRef, facingMode);
+
+  // Track video dimensions for canvas sizing
+  const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
+
+  // Update dimensions when video metadata loads or resizes
+  const updateDimensions = useCallback(() => {
+    const video = videoRef.current;
+    if (video && video.videoWidth > 0 && video.videoHeight > 0) {
+      // Use the actual rendered size of the video element
+      const rect = video.getBoundingClientRect();
+      setVideoDimensions({ width: rect.width, height: rect.height });
+    }
+  }, [videoRef]);
 
   // Set video source when stream changes
   useEffect(() => {
@@ -10,6 +26,27 @@ export function CameraPreview() {
       videoRef.current.srcObject = stream;
     }
   }, [stream, videoRef]);
+
+  // Listen for video metadata and resize events
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Update on loadedmetadata
+    video.addEventListener('loadedmetadata', updateDimensions);
+
+    // Also update on resize (handles responsive layout changes)
+    const resizeObserver = new ResizeObserver(updateDimensions);
+    resizeObserver.observe(video);
+
+    // Initial update in case video is already loaded
+    updateDimensions();
+
+    return () => {
+      video.removeEventListener('loadedmetadata', updateDimensions);
+      resizeObserver.disconnect();
+    };
+  }, [videoRef, updateDimensions]);
 
   // Loading state - responsive height
   if (isLoading) {
@@ -35,7 +72,7 @@ export function CameraPreview() {
     );
   }
 
-  // Video preview with camera switch button - responsive height
+  // Video preview with skeleton overlay and camera switch button
   return (
     <div className="relative w-full h-[70vh] md:h-auto md:aspect-video bg-gray-900 rounded-lg overflow-hidden">
       <video
@@ -48,6 +85,29 @@ export function CameraPreview() {
           transform: facingMode === 'user' ? 'scaleX(-1)' : 'none',
         }}
       />
+
+      {/* Pose skeleton overlay */}
+      {videoDimensions.width > 0 && videoDimensions.height > 0 && (
+        <PoseCanvas
+          landmarks={landmarks}
+          width={videoDimensions.width}
+          height={videoDimensions.height}
+        />
+      )}
+
+      {/* Detection status indicator */}
+      <div className="absolute top-4 left-4">
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+          isDetecting && landmarks
+            ? 'bg-green-500/80 text-white'
+            : 'bg-gray-800/80 text-gray-300'
+        }`}>
+          <div className={`w-2 h-2 rounded-full ${
+            isDetecting && landmarks ? 'bg-white animate-pulse' : 'bg-gray-500'
+          }`} />
+          {isDetecting && landmarks ? 'Tracking' : 'Initializing...'}
+        </div>
+      </div>
 
       {/* Camera switch button - positioned for thumb reach on mobile */}
       <button

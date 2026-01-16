@@ -33,7 +33,7 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: Storage Foundation — IndexedDB utils, extended types, useRecordingHistory hook
+- [x] 05-01: Storage Foundation — IndexedDB utils, extended types, useRecordingHistory hook
 - [ ] 05-02: UI Integration — RecordingList component, app integration (depends: 05-01)
 
 ## Progress
@@ -44,4 +44,4 @@ Plans:
 | 2. Pose Detection | v1.0 | 2/2 | Complete | 2026-01-16 |
 | 3. Recording | v1.0 | 2/2 | Complete | 2026-01-16 |
 | 4. Exercise Alerts | v1.0 | 2/2 | Complete | 2026-01-16 |
-| 5. Recording History | v1.1 | 0/2 | Not started | - |
+| 5. Recording History | v1.1 | 1/2 | In progress | - |

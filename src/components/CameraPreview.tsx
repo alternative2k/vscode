@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useCamera } from '../hooks/useCamera';
 import { usePoseDetection } from '../hooks/usePoseDetection';
-import { usePostureAlerts } from '../hooks/usePostureAlerts';
+import { useExerciseAlerts, ExerciseMode } from '../hooks/useExerciseAlerts';
 import { useRecording } from '../hooks/useRecording';
 import { PoseCanvas } from './PoseCanvas';
 import { AlertOverlay } from './AlertOverlay';
@@ -10,7 +10,10 @@ import { RecordingControls } from './RecordingControls';
 export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
   const { landmarks, isDetecting } = usePoseDetection(videoRef, facingMode);
-  const { currentAlert } = usePostureAlerts(landmarks);
+
+  // Exercise mode state
+  const [exerciseMode, setExerciseMode] = useState<ExerciseMode>('general');
+  const { currentAlert, isExercising } = useExerciseAlerts(landmarks, exerciseMode);
   const { state: recordingState, recording, duration, startRecording, stopRecording } = useRecording(stream);
 
   // Track video dimensions for canvas sizing
@@ -116,6 +119,47 @@ export function CameraPreview() {
           }`} />
           {isDetecting && landmarks ? 'Tracking' : 'Initializing...'}
         </div>
+      </div>
+
+      {/* Exercise mode selector */}
+      <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
+        <div className="flex gap-1 bg-gray-800/80 rounded-full p-1">
+          <button
+            onClick={() => setExerciseMode('general')}
+            className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+              exerciseMode === 'general'
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-300 hover:text-white'
+            }`}
+          >
+            General
+          </button>
+          <button
+            onClick={() => setExerciseMode('squat')}
+            className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+              exerciseMode === 'squat'
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-300 hover:text-white'
+            }`}
+          >
+            Squat
+          </button>
+          <button
+            disabled
+            className="px-3 py-1 text-xs font-medium rounded-full text-gray-500 cursor-not-allowed"
+            title="Coming soon"
+          >
+            Push-up
+          </button>
+        </div>
+
+        {/* Squat detected indicator */}
+        {exerciseMode === 'squat' && isExercising && (
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-purple-500/80 text-white">
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            Squat detected
+          </div>
+        )}
       </div>
 
       {/* Recording controls - indicator and buttons */}

@@ -1,11 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useCamera } from '../hooks/useCamera';
 import { usePoseDetection } from '../hooks/usePoseDetection';
+import { usePostureAlerts } from '../hooks/usePostureAlerts';
 import { PoseCanvas } from './PoseCanvas';
+import { AlertOverlay } from './AlertOverlay';
 
 export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
   const { landmarks, isDetecting } = usePoseDetection(videoRef, facingMode);
+  const { currentAlert } = usePostureAlerts(landmarks);
 
   // Track video dimensions for canvas sizing
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
@@ -94,6 +97,9 @@ export function CameraPreview() {
           height={videoDimensions.height}
         />
       )}
+
+      {/* Alert overlay for bad posture */}
+      <AlertOverlay alert={currentAlert} />
 
       {/* Detection status indicator */}
       <div className="absolute top-4 left-4">

@@ -10,22 +10,45 @@ interface UsePoseDetectionReturn {
 }
 
 export function usePoseDetection(
-  videoRef: React.RefObject<HTMLVideoElement>,
+  videoRef: React.RefObject<HTMLVideoElement | null>,
   facingMode: FacingMode = 'user'
 ): UsePoseDetectionReturn {
   const [landmarks, setLandmarks] = useState<Landmark[] | null>(null);
   const [isDetecting, setIsDetecting] = useState(false);
-  const poseRef = useRef<Pose | null>(null);
+  const [pose, setPose] = useState<Pose | null>(null);
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
-  // Handle pose results
+  // Store facingMode in a ref to avoid recreating pose instance
+  const facingModeRef = useRef(facingMode);
+  facingModeRef.current = facingMode;
+
+  // Poll for video element since ref.current doesn't trigger re-renders
+  useEffect(() => {
+    const checkForVideo = () => {
+      if (videoRef.current && !videoElement) {
+        setVideoElement(videoRef.current);
+      }
+    };
+
+    // Check immediately
+    checkForVideo();
+
+    // Also check periodically in case it appears later
+    const interval = setInterval(checkForVideo, 100);
+
+    return () => clearInterval(interval);
+  }, [videoRef, videoElement]);
+
+  // Handle pose results - use ref to avoid dependency on facingMode
   const onResults = useCallback((results: Results) => {
     if (results.poseLandmarks) {
       // Transform landmarks based on facing mode
       // When using front camera (user), we need to flip x coordinates
       // because the video is mirrored with scaleX(-1)
+      const currentFacingMode = facingModeRef.current;
       const transformedLandmarks = results.poseLandmarks.map((landmark) => ({
-        x: facingMode === 'user' ? 1 - landmark.x : landmark.x,
+        x: currentFacingMode === 'user' ? 1 - landmark.x : landmark.x,
         y: landmark.y,
         z: landmark.z,
         visibility: landmark.visibility ?? 0,
@@ -34,17 +57,17 @@ export function usePoseDetection(
     } else {
       setLandmarks(null);
     }
-  }, [facingMode]);
+  }, []);
 
-  // Initialize MediaPipe Pose
+  // Initialize MediaPipe Pose (only once on mount)
   useEffect(() => {
-    const pose = new Pose({
+    const poseInstance = new Pose({
       locateFile: (file) => {
         return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
       },
     });
 
-    pose.setOptions({
+    poseInstance.setOptions({
       modelComplexity: 1, // 0=lite, 1=full, 2=heavy
       smoothLandmarks: true,
       enableSegmentation: false,
@@ -53,42 +76,36 @@ export function usePoseDetection(
       minTrackingConfidence: 0.5,
     });
 
-    pose.onResults(onResults);
-    poseRef.current = pose;
+    poseInstance.onResults(onResults);
+    setPose(poseInstance);
 
     return () => {
-      if (poseRef.current) {
-        poseRef.current.close();
-        poseRef.current = null;
-      }
+      poseInstance.close();
+      setPose(null);
     };
   }, [onResults]);
 
   // Detection loop using requestAnimationFrame
   useEffect(() => {
-    const video = videoRef.current;
-    const pose = poseRef.current;
-
-    if (!video || !pose) {
+    if (!videoElement || !pose) {
       return;
     }
 
     let isRunning = true;
 
     const detectPose = async () => {
-      if (!isRunning || !video || !pose) {
+      if (!isRunning || !videoElement || !pose) {
         return;
       }
 
       // Check if video is ready (readyState >= 2 means HAVE_CURRENT_DATA)
-      if (video.readyState >= 2) {
+      if (videoElement.readyState >= 2) {
         setIsDetecting(true);
         try {
-          await pose.send({ image: video });
+          await pose.send({ image: videoElement });
         } catch (error) {
           // Silently handle errors during detection
           // This can happen during camera switching or unmounting
-          console.debug('Pose detection frame skipped:', error);
         }
       }
 
@@ -109,7 +126,7 @@ export function usePoseDetection(
         animationFrameRef.current = null;
       }
     };
-  }, [videoRef]);
+  }, [videoElement, pose]);
 
   return {
     landmarks,

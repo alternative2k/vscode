@@ -17,7 +17,7 @@ None
 - [x] **Phase 1: Foundation** - Camera access, responsive UI, password protection
 - [x] **Phase 2: Pose Detection** - Skeleton overlay and general posture alerts
 - [x] **Phase 3: Recording** - Video capture and local download
-- [ ] **Phase 4: Exercise Alerts** - Squat and push-up form detection
+- [x] **Phase 4: Exercise Alerts** - Squat and push-up form detection
 
 ## Phase Details
 
@@ -65,7 +65,7 @@ Plans:
 
 Plans:
 - [x] 04-01: Squat form detection (knee angle, back, depth)
-- [ ] 04-02: Push-up form detection (alignment, elbow, depth)
+- [x] 04-02: Push-up form detection (alignment, elbow, depth)
 
 ## Progress
 
@@ -77,4 +77,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Foundation | 3/3 | Complete | 2026-01-16 |
 | 2. Pose Detection | 2/2 | Complete | 2026-01-16 |
 | 3. Recording | 2/2 | Complete | 2026-01-16 |
-| 4. Exercise Alerts | 1/2 | In progress | - |
+| 4. Exercise Alerts | 2/2 | Complete | 2026-01-16 |

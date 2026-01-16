@@ -1,17 +1,22 @@
+import { CameraPreview } from './components/CameraPreview';
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center">
-      <h1 className="text-5xl font-bold text-white mb-8">FormCheck</h1>
-      <div className="bg-gray-800 rounded-lg p-8 text-center max-w-md w-full mx-4">
-        <div className="aspect-video bg-gray-700 rounded-lg flex items-center justify-center mb-4">
-          <p className="text-gray-400">Camera preview will appear here</p>
+    <div className="min-h-screen bg-gray-900 flex flex-col">
+      {/* Header */}
+      <header className="py-6 px-4 text-center">
+        <h1 className="text-4xl font-bold text-white">FormCheck</h1>
+        <p className="text-gray-400 text-sm mt-2">Real-time exercise form feedback</p>
+      </header>
+
+      {/* Main camera preview area */}
+      <main className="flex-1 flex items-center justify-center px-4 pb-8">
+        <div className="w-full max-w-3xl">
+          <CameraPreview />
         </div>
-        <p className="text-gray-400 text-sm">
-          Real-time exercise form feedback
-        </p>
-      </div>
+      </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { StoredRecording } from '../types/recording';
+import type { S3Config } from '../types/s3';
+import type { UploadItem } from '../hooks/useS3Upload';
 
 // Format bytes to human-readable size
 function formatFileSize(bytes: number): string {
@@ -36,6 +38,12 @@ interface RecordingListProps {
   onDelete: (id: number) => Promise<void>;
   storageStats: { count: number; totalSize: number };
   isLoading: boolean;
+  // S3 upload props
+  s3Config: S3Config | null;
+  uploads: UploadItem[];
+  onUpload: (recording: StoredRecording) => void;
+  onRetry: (id: number, recording: StoredRecording) => void;
+  onConfigClick: () => void;
 }
 
 export function RecordingList({
@@ -45,9 +53,22 @@ export function RecordingList({
   onDelete,
   storageStats,
   isLoading,
+  s3Config,
+  uploads,
+  onUpload,
+  onRetry,
+  onConfigClick,
 }: RecordingListProps) {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+
+  // Get upload item for a recording
+  const getUploadForRecording = useCallback(
+    (recordingId: number): UploadItem | undefined => {
+      return uploads.find((u) => u.id === recordingId);
+    },
+    [uploads]
+  );
 
   // Handle delete with confirmation
   const handleDeleteClick = useCallback((id: number) => {
@@ -98,24 +119,69 @@ export function RecordingList({
               {formatFileSize(storageStats.totalSize)}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-700 transition-colors"
-            aria-label="Close"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-5 h-5"
+          <div className="flex items-center gap-2">
+            {/* Configure S3 button */}
+            <button
+              onClick={onConfigClick}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              title={s3Config ? 'S3 configured' : 'Configure S3 for cloud backup'}
             >
-              <path
-                fillRule="evenodd"
-                d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
+              {s3Config ? (
+                <>
+                  {/* Green checkmark when configured */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="w-4 h-4 text-green-400"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>S3</span>
+                </>
+              ) : (
+                <>
+                  {/* Gear icon when not configured */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.84 1.804A1 1 0 018.82 1h2.36a1 1 0 01.98.804l.331 1.652a6.993 6.993 0 011.929 1.115l1.598-.54a1 1 0 011.186.447l1.18 2.044a1 1 0 01-.205 1.251l-1.267 1.113a7.047 7.047 0 010 2.228l1.267 1.113a1 1 0 01.206 1.25l-1.18 2.045a1 1 0 01-1.187.447l-1.598-.54a6.993 6.993 0 01-1.929 1.115l-.33 1.652a1 1 0 01-.98.804H8.82a1 1 0 01-.98-.804l-.331-1.652a6.993 6.993 0 01-1.929-1.115l-1.598.54a1 1 0 01-1.186-.447l-1.18-2.044a1 1 0 01.205-1.251l1.267-1.113a7.047 7.047 0 010-2.228L1.821 7.773a1 1 0 01-.206-1.25l1.18-2.045a1 1 0 011.187-.447l1.598.54A6.993 6.993 0 017.51 3.456l.33-1.652zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Configure S3</span>
+                </>
+              )}
+            </button>
+            {/* Close button */}
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-700 transition-colors"
+              aria-label="Close"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Content */}
@@ -171,6 +237,113 @@ export function RecordingList({
                         {formatFileSize(rec.fileSize)}
                       </p>
                     </div>
+
+                    {/* Upload button / status */}
+                    {(() => {
+                      const upload = getUploadForRecording(rec.id);
+
+                      // No S3 config - show disabled upload button
+                      if (!s3Config) {
+                        return (
+                          <button
+                            disabled
+                            className="p-2 text-gray-500 cursor-not-allowed"
+                            title="Configure S3 first"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="w-5 h-5"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10.5 3.75a6 6 0 00-5.98 6.496A5.25 5.25 0 006.75 20.25H18a4.5 4.5 0 002.206-8.423 3.75 3.75 0 00-4.133-4.303A6.001 6.001 0 0010.5 3.75zm2.03 5.47a.75.75 0 00-1.06 0l-3 3a.75.75 0 101.06 1.06l1.72-1.72v4.69a.75.75 0 001.5 0v-4.69l1.72 1.72a.75.75 0 101.06-1.06l-3-3z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        );
+                      }
+
+                      // Upload complete - show green checkmark
+                      if (upload?.status === 'complete') {
+                        return (
+                          <span className="p-2 text-green-400" title="Uploaded">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="w-5 h-5"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </span>
+                        );
+                      }
+
+                      // Upload failed - show retry button
+                      if (upload?.status === 'failed') {
+                        return (
+                          <button
+                            onClick={() => onRetry(rec.id, rec)}
+                            className="p-2 text-red-400 hover:text-red-300 rounded-full hover:bg-gray-700 transition-colors"
+                            title={upload.error || 'Upload failed - click to retry'}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="w-5 h-5"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4.755 10.059a7.5 7.5 0 0112.548-3.364l1.903 1.903h-3.183a.75.75 0 100 1.5h4.992a.75.75 0 00.75-.75V4.356a.75.75 0 00-1.5 0v3.18l-1.9-1.9A9 9 0 003.306 9.67a.75.75 0 101.45.388zm15.408 3.352a.75.75 0 00-.919.53 7.5 7.5 0 01-12.548 3.364l-1.902-1.903h3.183a.75.75 0 000-1.5H2.984a.75.75 0 00-.75.75v4.992a.75.75 0 001.5 0v-3.18l1.9 1.9a9 9 0 0015.059-4.035.75.75 0 00-.53-.918z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        );
+                      }
+
+                      // Uploading - show progress
+                      if (upload?.status === 'pending' || upload?.status === 'uploading') {
+                        return (
+                          <div className="flex items-center gap-2">
+                            <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                            <span className="text-xs text-gray-400">
+                              {upload.progress.percentage}%
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      // No upload yet - show upload button
+                      return (
+                        <button
+                          onClick={() => onUpload(rec)}
+                          className="p-2 text-gray-400 hover:text-blue-400 rounded-full hover:bg-gray-700 transition-colors"
+                          title="Upload to S3"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10.5 3.75a6 6 0 00-5.98 6.496A5.25 5.25 0 006.75 20.25H18a4.5 4.5 0 002.206-8.423 3.75 3.75 0 00-4.133-4.303A6.001 6.001 0 0010.5 3.75zm2.03 5.47a.75.75 0 00-1.06 0l-3 3a.75.75 0 101.06 1.06l1.72-1.72v4.69a.75.75 0 001.5 0v-4.69l1.72 1.72a.75.75 0 101.06-1.06l-3-3z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      );
+                    })()}
 
                     {/* Delete button */}
                     <button

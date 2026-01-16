@@ -4,10 +4,12 @@ import { usePoseDetection } from '../hooks/usePoseDetection';
 import { useExerciseAlerts, ExerciseMode } from '../hooks/useExerciseAlerts';
 import { useRecording } from '../hooks/useRecording';
 import { useRecordingHistory } from '../hooks/useRecordingHistory';
+import { useS3Upload } from '../hooks/useS3Upload';
 import { PoseCanvas } from './PoseCanvas';
 import { AlertOverlay } from './AlertOverlay';
 import { RecordingControls } from './RecordingControls';
 import { RecordingList } from './RecordingList';
+import { S3ConfigModal } from './S3ConfigModal';
 
 export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
@@ -29,6 +31,17 @@ export function CameraPreview() {
   const [showRecordingList, setShowRecordingList] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // S3 upload
+  const {
+    config: s3Config,
+    saveConfig: saveS3Config,
+    clearConfig: clearS3Config,
+    uploads,
+    uploadRecording,
+    retryUpload,
+  } = useS3Upload();
+  const [showS3Config, setShowS3Config] = useState(false);
+
   // Handle save recording to IndexedDB
   const handleSaveRecording = useCallback(async () => {
     if (!recording) return;
@@ -47,6 +60,15 @@ export function CameraPreview() {
 
   const handleCloseHistory = useCallback(() => {
     setShowRecordingList(false);
+  }, []);
+
+  // S3 config modal handlers
+  const handleOpenS3Config = useCallback(() => {
+    setShowS3Config(true);
+  }, []);
+
+  const handleCloseS3Config = useCallback(() => {
+    setShowS3Config(false);
   }, []);
 
   // Track video dimensions for canvas sizing
@@ -232,6 +254,20 @@ export function CameraPreview() {
         onDelete={deleteRecording}
         storageStats={storageStats}
         isLoading={isHistoryLoading}
+        s3Config={s3Config}
+        uploads={uploads}
+        onUpload={uploadRecording}
+        onRetry={retryUpload}
+        onConfigClick={handleOpenS3Config}
+      />
+
+      {/* S3 configuration modal */}
+      <S3ConfigModal
+        isOpen={showS3Config}
+        onClose={handleCloseS3Config}
+        config={s3Config}
+        onSave={saveS3Config}
+        onClear={clearS3Config}
       />
 
       {/* Camera switch button - positioned for thumb reach on mobile */}

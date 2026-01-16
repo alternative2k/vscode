@@ -64,7 +64,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 04-01: Squat form detection (knee angle, back, depth)
+- [x] 04-01: Squat form detection (knee angle, back, depth)
 - [ ] 04-02: Push-up form detection (alignment, elbow, depth)
 
 ## Progress
@@ -77,4 +77,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Foundation | 3/3 | Complete | 2026-01-16 |
 | 2. Pose Detection | 2/2 | Complete | 2026-01-16 |
 | 3. Recording | 2/2 | Complete | 2026-01-16 |
-| 4. Exercise Alerts | 0/2 | Not started | - |
+| 4. Exercise Alerts | 1/2 | In progress | - |

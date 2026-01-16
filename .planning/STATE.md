@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-15)
 
 **Core value:** Real-time visual feedback on exercise form — skeleton overlay and posture alerts must work reliably
-**Current focus:** Phase 3 — Recording
+**Current focus:** Phase 4 — Exercise Alerts
 
 ## Current Position
 
-Phase: 3 of 4 (Recording)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-01-16 — Completed 03-02-PLAN.md
+Phase: 4 of 4 (Exercise Alerts)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-01-16 — Completed 04-01-PLAN.md
 
-Progress: ████████░░ 80%
+Progress: █████████░ 90%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 10 min
-- Total execution time: 1.07 hours
+- Total plans completed: 8
+- Average duration: 9 min
+- Total execution time: 1.20 hours
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: ████████░░ 80%
 | 01-foundation | 3/3 | 28 min | 9 min |
 | 02-pose-detection | 2/2 | 20 min | 10 min |
 | 03-recording | 2/2 | 16 min | 8 min |
+| 04-exercise-alerts | 1/2 | 8 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (12 min), 02-02 (8 min), 03-01 (8 min), 03-02 (8 min)
+- Last 5 plans: 02-02 (8 min), 03-01 (8 min), 03-02 (8 min), 04-01 (8 min)
 - Trend: Stable
 
 ## Accumulated Context
@@ -59,6 +60,11 @@ Recent decisions affecting current work:
 - 1000ms timeslice for periodic recording chunks
 - Filename format formcheck-YYYY-MM-DD-HHmmss.webm for downloads
 - RecordingControls component for separation of concerns
+- 100 degrees knee angle threshold for proper squat depth
+- 150 degrees knee angle to detect squat stance vs standing
+- 45 degrees forward lean threshold for torso angle warning
+- 15 degrees asymmetry threshold between left/right knee angles
+- ExerciseMode type for routing alerts to appropriate form checker
 
 ### Pending Todos
 
@@ -71,5 +77,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-16
-Stopped at: Completed 03-02-PLAN.md (Download functionality)
+Stopped at: Completed 04-01-PLAN.md (Squat form detection)
 Resume file: None

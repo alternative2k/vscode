@@ -41,7 +41,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 02-01: MediaPipe integration and skeleton drawing
+- [x] 02-01: MediaPipe integration and skeleton drawing
 - [ ] 02-02: General posture detection and audio/visual alerts
 
 ### Phase 3: Recording
@@ -75,6 +75,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-01-16 |
-| 2. Pose Detection | 0/2 | Not started | - |
+| 2. Pose Detection | 1/2 | In progress | - |
 | 3. Recording | 0/2 | Not started | - |
 | 4. Exercise Alerts | 0/2 | Not started | - |

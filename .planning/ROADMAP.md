@@ -30,7 +30,7 @@ None
 
 Plans:
 - [x] 01-01: Project setup (Vite + React + TypeScript + Tailwind)
-- [ ] 01-02: Camera access with permission UX
+- [x] 01-02: Camera access with permission UX
 - [ ] 01-03: Password gate and responsive layout
 
 ### Phase 2: Pose Detection
@@ -74,7 +74,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/3 | In progress | - |
+| 1. Foundation | 2/3 | In progress | - |
 | 2. Pose Detection | 0/2 | Not started | - |
 | 3. Recording | 0/2 | Not started | - |
 | 4. Exercise Alerts | 0/2 | Not started | - |

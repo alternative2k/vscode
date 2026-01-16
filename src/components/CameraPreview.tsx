@@ -3,9 +3,11 @@ import { useCamera } from '../hooks/useCamera';
 import { usePoseDetection } from '../hooks/usePoseDetection';
 import { useExerciseAlerts, ExerciseMode } from '../hooks/useExerciseAlerts';
 import { useRecording } from '../hooks/useRecording';
+import { useRecordingHistory } from '../hooks/useRecordingHistory';
 import { PoseCanvas } from './PoseCanvas';
 import { AlertOverlay } from './AlertOverlay';
 import { RecordingControls } from './RecordingControls';
+import { RecordingList } from './RecordingList';
 
 export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
@@ -15,6 +17,37 @@ export function CameraPreview() {
   const [exerciseMode, setExerciseMode] = useState<ExerciseMode>('general');
   const { currentAlert, isExercising } = useExerciseAlerts(landmarks, exerciseMode);
   const { state: recordingState, recording, duration, startRecording, stopRecording } = useRecording(stream);
+
+  // Recording history
+  const {
+    recordings,
+    isLoading: isHistoryLoading,
+    saveRecording,
+    deleteRecording,
+    storageStats,
+  } = useRecordingHistory();
+  const [showRecordingList, setShowRecordingList] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Handle save recording to IndexedDB
+  const handleSaveRecording = useCallback(async () => {
+    if (!recording) return;
+    setIsSaving(true);
+    try {
+      await saveRecording(recording);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [recording, saveRecording]);
+
+  // Open/close recording list modal
+  const handleShowHistory = useCallback(() => {
+    setShowRecordingList(true);
+  }, []);
+
+  const handleCloseHistory = useCallback(() => {
+    setShowRecordingList(false);
+  }, []);
 
   // Track video dimensions for canvas sizing
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
@@ -185,6 +218,20 @@ export function CameraPreview() {
         duration={duration}
         onStart={startRecording}
         onStop={stopRecording}
+        onSave={handleSaveRecording}
+        onShowHistory={handleShowHistory}
+        recordingCount={storageStats.count}
+        isSaving={isSaving}
+      />
+
+      {/* Recording list modal */}
+      <RecordingList
+        isOpen={showRecordingList}
+        onClose={handleCloseHistory}
+        recordings={recordings}
+        onDelete={deleteRecording}
+        storageStats={storageStats}
+        isLoading={isHistoryLoading}
       />
 
       {/* Camera switch button - positioned for thumb reach on mobile */}

@@ -12,12 +12,12 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **CAM-01**: User can see live camera preview of themselves
 - [x] **CAM-02**: User can switch between front and back camera on mobile
 - [x] **CAM-03**: UI adapts to desktop and mobile screen sizes
-- [ ] **CAM-04**: User receives audio/visual cue when bad form is detected
+- [x] **CAM-04**: User receives audio/visual cue when bad form is detected
 
 ### Pose Detection
 
-- [ ] **POSE-01**: Skeleton overlay displays 33 body landmarks on live video
-- [ ] **POSE-02**: System detects and alerts on obviously wrong postures
+- [x] **POSE-01**: Skeleton overlay displays 33 body landmarks on live video
+- [x] **POSE-02**: System detects and alerts on obviously wrong postures
 - [ ] **POSE-03**: System alerts on squat form issues (knee angle, back straightness, depth)
 - [ ] **POSE-04**: System alerts on push-up form issues (body alignment, elbow angle, depth)
 
@@ -67,9 +67,9 @@ Which phases cover which requirements. Updated by create-roadmap.
 | CAM-02 | Phase 1 | Complete |
 | CAM-03 | Phase 1 | Complete |
 | AUTH-01 | Phase 1 | Complete |
-| POSE-01 | Phase 2 | Pending |
-| POSE-02 | Phase 2 | Pending |
-| CAM-04 | Phase 2 | Pending |
+| POSE-01 | Phase 2 | Complete |
+| POSE-02 | Phase 2 | Complete |
+| CAM-04 | Phase 2 | Complete |
 | REC-01 | Phase 3 | Pending |
 | REC-02 | Phase 3 | Pending |
 | POSE-03 | Phase 4 | Pending |
@@ -82,4 +82,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-15*
-*Last updated: 2026-01-16 after Phase 1 completion*
+*Last updated: 2026-01-16 after Phase 2 completion*

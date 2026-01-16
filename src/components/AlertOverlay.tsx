@@ -1,7 +1,7 @@
-import { PostureAlert } from '../utils/postureRules';
+import { ExerciseAlert } from '../hooks/useExerciseAlerts';
 
 interface AlertOverlayProps {
-  alert: PostureAlert | null;
+  alert: ExerciseAlert | null;
 }
 
 /**

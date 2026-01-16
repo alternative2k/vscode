@@ -6,7 +6,7 @@ interface UseCameraReturn {
   stream: MediaStream | null;
   error: string | null;
   isLoading: boolean;
-  videoRef: React.RefObject<HTMLVideoElement | null>;
+  videoRef: React.RefObject<HTMLVideoElement>;
   facingMode: FacingMode;
   toggleCamera: () => void;
 }
@@ -16,7 +16,7 @@ export function useCamera(): UseCameraReturn {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [facingMode, setFacingMode] = useState<FacingMode>('user');
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null!);
 
   const stopStream = useCallback((currentStream: MediaStream | null) => {
     if (currentStream) {

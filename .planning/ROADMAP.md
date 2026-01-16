@@ -39,10 +39,11 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 **Depends on**: Phase 5 (Recording History)
 **Research**: Likely (AWS S3 browser SDK, CORS configuration for public bucket)
 **Research topics**: AWS SDK for browser, S3 CORS setup, presigned URLs vs public bucket
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: TBD (run /gsd:plan-phase 6 to break down)
+- [ ] 06-01: S3 upload foundation (types, upload service, hook)
+- [ ] 06-02: UI integration (config modal, upload buttons, progress)
 
 ## Progress
 
@@ -53,4 +54,4 @@ Plans:
 | 3. Recording | v1.0 | 2/2 | Complete | 2026-01-16 |
 | 4. Exercise Alerts | v1.0 | 2/2 | Complete | 2026-01-16 |
 | 5. Recording History | v1.1 | 2/2 | Complete | 2026-01-16 |
-| 6. S3 Upload | v2.0 | 0/? | Not started | - |
+| 6. S3 Upload | v2.0 | 0/2 | Not started | - |

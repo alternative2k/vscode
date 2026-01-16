@@ -18,8 +18,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **POSE-01**: Skeleton overlay displays 33 body landmarks on live video
 - [x] **POSE-02**: System detects and alerts on obviously wrong postures
-- [ ] **POSE-03**: System alerts on squat form issues (knee angle, back straightness, depth)
-- [ ] **POSE-04**: System alerts on push-up form issues (body alignment, elbow angle, depth)
+- [x] **POSE-03**: System alerts on squat form issues (knee angle, back straightness, depth)
+- [x] **POSE-04**: System alerts on push-up form issues (body alignment, elbow angle, depth)
 
 ### Recording
 
@@ -72,8 +72,8 @@ Which phases cover which requirements. Updated by create-roadmap.
 | CAM-04 | Phase 2 | Complete |
 | REC-01 | Phase 3 | Complete |
 | REC-02 | Phase 3 | Complete |
-| POSE-03 | Phase 4 | Pending |
-| POSE-04 | Phase 4 | Pending |
+| POSE-03 | Phase 4 | Complete |
+| POSE-04 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 11 total
@@ -82,4 +82,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-15*
-*Last updated: 2026-01-16 after Phase 3 completion*
+*Last updated: 2026-01-16 after Phase 4 completion*

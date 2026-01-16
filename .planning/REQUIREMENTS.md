@@ -9,9 +9,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Camera & Video
 
-- [ ] **CAM-01**: User can see live camera preview of themselves
-- [ ] **CAM-02**: User can switch between front and back camera on mobile
-- [ ] **CAM-03**: UI adapts to desktop and mobile screen sizes
+- [x] **CAM-01**: User can see live camera preview of themselves
+- [x] **CAM-02**: User can switch between front and back camera on mobile
+- [x] **CAM-03**: UI adapts to desktop and mobile screen sizes
 - [ ] **CAM-04**: User receives audio/visual cue when bad form is detected
 
 ### Pose Detection
@@ -28,7 +28,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Authentication
 
-- [ ] **AUTH-01**: App is protected by shared password for small group access
+- [x] **AUTH-01**: App is protected by shared password for small group access
 
 ## v2 Requirements
 
@@ -63,10 +63,10 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CAM-01 | Phase 1 | Pending |
-| CAM-02 | Phase 1 | Pending |
-| CAM-03 | Phase 1 | Pending |
-| AUTH-01 | Phase 1 | Pending |
+| CAM-01 | Phase 1 | Complete |
+| CAM-02 | Phase 1 | Complete |
+| CAM-03 | Phase 1 | Complete |
+| AUTH-01 | Phase 1 | Complete |
 | POSE-01 | Phase 2 | Pending |
 | POSE-02 | Phase 2 | Pending |
 | CAM-04 | Phase 2 | Pending |
@@ -82,4 +82,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-15*
-*Last updated: 2026-01-15 after roadmap creation*
+*Last updated: 2026-01-16 after Phase 1 completion*

@@ -10,9 +10,9 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 
 ## Current State
 
-**Shipped:** v1.0 MVP (2026-01-16)
+**Shipped:** v1.1 Recording History (2026-01-16)
 
-- 2,099 lines TypeScript across 16 files
+- 2,774 lines TypeScript across 19 files
 - Tech stack: Vite, React, TypeScript, Tailwind CSS v4, MediaPipe Pose
 - Deployable as static site to Vercel/Netlify/GitHub Pages
 
@@ -23,6 +23,7 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 - Squat form detection (depth, knee cave, forward lean, asymmetry)
 - Push-up form detection (depth, hip sag/pike, elbow flare)
 - Video recording with local download
+- Recording history with IndexedDB persistence
 - Password protection for small group access
 - Responsive mobile-first layout
 
@@ -37,6 +38,7 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 - ✓ General posture flagging for obviously wrong positions — v1.0
 - ✓ Video recording (clean video without overlay burned in) — v1.0
 - ✓ Local save of recordings — v1.0
+- ✓ Recording history with persistence — v1.1
 - ✓ Simple authentication for small group access — v1.0
 - ✓ Modern, clean UI that works on desktop and mobile — v1.0
 - ✓ Deployable to free/cheap static hosting — v1.0
@@ -81,6 +83,9 @@ S3 upload (deferred to v2) means users would configure their own bucket credenti
 | Live overlay only, clean recordings | Simpler implementation, more flexible output | ✓ Good |
 | Client-side pose detection | No backend needed, free hosting, privacy | ✓ Good |
 | Web app over native | Single codebase covers laptop + mobile | ✓ Good |
+| Native IndexedDB API (no wrapper) | Simple use case, fewer dependencies | ✓ Good |
+| Auto-increment id for recordings | Simplifies storage layer | ✓ Good |
+| Modal overlay with click-to-close | Intuitive UX for recording history | ✓ Good |
 
 ---
-*Last updated: 2026-01-16 after v1.0 milestone*
+*Last updated: 2026-01-16 after v1.1 milestone*

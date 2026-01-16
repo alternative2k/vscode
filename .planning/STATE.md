@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-16)
 
 **Core value:** Real-time visual feedback on exercise form — skeleton overlay and posture alerts must work reliably
-**Current focus:** v1.1 Recording History — local recording management with IndexedDB
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 5 of 5 (Recording History)
-Plan: 2 of 2 in current phase
-Status: Complete
-Last activity: 2026-01-16 — Completed 05-02-PLAN.md
+Phase: 5 of 5 (Recording History) — COMPLETE
+Plan: All plans complete
+Status: v1.1 milestone shipped
+Last activity: 2026-01-16 — v1.1 milestone complete
 
 Progress: ██████████ 100%
 

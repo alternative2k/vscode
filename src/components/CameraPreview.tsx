@@ -11,10 +11,10 @@ export function CameraPreview() {
     }
   }, [stream, videoRef]);
 
-  // Loading state
+  // Loading state - responsive height
   if (isLoading) {
     return (
-      <div className="relative w-full aspect-video bg-gray-700 rounded-lg flex items-center justify-center">
+      <div className="relative w-full h-[70vh] md:h-auto md:aspect-video bg-gray-700 rounded-lg flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
           <p className="text-gray-300 text-sm">Requesting camera access...</p>
@@ -23,10 +23,10 @@ export function CameraPreview() {
     );
   }
 
-  // Error state
+  // Error state - responsive height
   if (error) {
     return (
-      <div className="relative w-full aspect-video bg-gray-700 rounded-lg flex items-center justify-center p-6">
+      <div className="relative w-full h-[70vh] md:h-auto md:aspect-video bg-gray-700 rounded-lg flex items-center justify-center p-6">
         <div className="text-center">
           <div className="text-red-400 text-4xl mb-3">📷</div>
           <p className="text-gray-300 text-sm">{error}</p>
@@ -35,9 +35,9 @@ export function CameraPreview() {
     );
   }
 
-  // Video preview with camera switch button
+  // Video preview with camera switch button - responsive height
   return (
-    <div className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden">
+    <div className="relative w-full h-[70vh] md:h-auto md:aspect-video bg-gray-900 rounded-lg overflow-hidden">
       <video
         ref={videoRef}
         autoPlay
@@ -49,10 +49,11 @@ export function CameraPreview() {
         }}
       />
 
-      {/* Camera switch button */}
+      {/* Camera switch button - positioned for thumb reach on mobile */}
       <button
         onClick={toggleCamera}
-        className="absolute bottom-4 right-4 bg-gray-800/80 hover:bg-gray-700/90 text-white p-3 rounded-full transition-colors shadow-lg"
+        className="absolute bottom-6 right-4 md:bottom-4 bg-gray-800/80 hover:bg-gray-700/90 active:bg-gray-600/90 text-white p-3 rounded-full transition-colors shadow-lg"
+        style={{ minWidth: '48px', minHeight: '48px' }}
         aria-label="Switch camera"
         title="Switch camera"
       >

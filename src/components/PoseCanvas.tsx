@@ -79,7 +79,7 @@ export function PoseCanvas({ landmarks, width, height }: PoseCanvasProps) {
       ref={canvasRef}
       width={width}
       height={height}
-      className="absolute top-0 left-0 w-full h-full pointer-events-none"
+      className="absolute top-0 left-0 w-full h-full pointer-events-none z-10"
     />
   );
 }

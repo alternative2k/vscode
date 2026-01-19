@@ -17,6 +17,9 @@ export function CameraPreview() {
 
   // Exercise mode state
   const [exerciseMode, setExerciseMode] = useState<ExerciseMode>('general');
+
+  // Skeleton overlay visibility state
+  const [showSkeleton, setShowSkeleton] = useState(true);
   const { currentAlert, isExercising } = useExerciseAlerts(landmarks, exerciseMode);
   const { state: recordingState, recording, duration, startRecording, stopRecording } = useRecording(stream);
 
@@ -151,7 +154,7 @@ export function CameraPreview() {
       />
 
       {/* Pose skeleton overlay */}
-      {videoDimensions.width > 0 && videoDimensions.height > 0 && (
+      {showSkeleton && videoDimensions.width > 0 && videoDimensions.height > 0 && (
         <PoseCanvas
           landmarks={landmarks}
           width={videoDimensions.width}
@@ -162,8 +165,8 @@ export function CameraPreview() {
       {/* Alert overlay for bad posture */}
       <AlertOverlay alert={currentAlert} />
 
-      {/* Detection status indicator */}
-      <div className="absolute top-4 left-4">
+      {/* Detection status indicator and skeleton toggle */}
+      <div className="absolute top-4 left-4 flex flex-col gap-2">
         <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
           isDetecting && landmarks
             ? 'bg-green-500/80 text-white'
@@ -174,6 +177,36 @@ export function CameraPreview() {
           }`} />
           {isDetecting && landmarks ? 'Tracking' : 'Initializing...'}
         </div>
+
+        {/* Skeleton overlay toggle button */}
+        <button
+          onClick={() => setShowSkeleton(!showSkeleton)}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            showSkeleton
+              ? 'bg-cyan-500/80 text-white hover:bg-cyan-600/80'
+              : 'bg-gray-800/80 text-gray-300 hover:bg-gray-700/80'
+          }`}
+          title={showSkeleton ? 'Hide skeleton overlay' : 'Show skeleton overlay'}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-3 h-3"
+          >
+            {/* Skeleton icon - simplified stick figure */}
+            <circle cx="12" cy="4" r="2" />
+            <line x1="12" y1="6" x2="12" y2="14" />
+            <line x1="8" y1="9" x2="16" y2="9" />
+            <line x1="12" y1="14" x2="8" y2="20" />
+            <line x1="12" y1="14" x2="16" y2="20" />
+          </svg>
+          {showSkeleton ? 'Skeleton On' : 'Skeleton Off'}
+        </button>
       </div>
 
       {/* Exercise mode selector */}

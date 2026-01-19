@@ -39,6 +39,8 @@ export function useExerciseAlerts(
   const lastAudioPlayedRef = useRef<number>(0);
   const audioContextRef = useRef<AudioContext | null>(null);
   const pendingAlertRef = useRef<ExerciseAlert | null>(null);
+  const currentAlertTypeRef = useRef<string | null>(null);
+  const isExercisingRef = useRef(false);
 
   /**
    * Create or get AudioContext (lazy initialization for Chrome autoplay policy)
@@ -103,39 +105,37 @@ export function useExerciseAlerts(
 
   /**
    * Get alert based on exercise mode
+   * Returns both the alert and whether the user is in exercise position
    */
-  const getAlert = useCallback((landmarks: Landmark[]): ExerciseAlert | null => {
+  const getAlertAndExerciseState = useCallback((landmarks: Landmark[]): { alert: ExerciseAlert | null; exercising: boolean } => {
     switch (mode) {
       case 'squat': {
         // Check if in squat position
         const inSquatPosition = isSquatPosition(landmarks);
-        setIsExercising(inSquatPosition);
 
         if (inSquatPosition) {
           // In squat - check squat-specific form
-          return checkSquatForm(landmarks);
+          return { alert: checkSquatForm(landmarks), exercising: true };
         } else {
           // Standing between reps - check general posture
-          return checkGeneralPosture(landmarks);
+          return { alert: checkGeneralPosture(landmarks), exercising: false };
         }
       }
       case 'pushup': {
         // Check if in push-up position
         const inPushupPosition = isPushupPosition(landmarks);
-        setIsExercising(inPushupPosition);
 
         if (inPushupPosition) {
           // In push-up - check push-up-specific form
-          return checkPushupForm(landmarks);
+          return { alert: checkPushupForm(landmarks), exercising: true };
         } else {
           // Between reps - check general posture
-          return checkGeneralPosture(landmarks);
+          return { alert: checkGeneralPosture(landmarks), exercising: false };
         }
       }
       case 'general':
       default: {
-        setIsExercising(false);
-        return checkGeneralPosture(landmarks);
+        return { alert: checkGeneralPosture(landmarks), exercising: false };
       }
     }
   }, [mode]);
@@ -146,15 +146,27 @@ export function useExerciseAlerts(
   useEffect(() => {
     if (!landmarks) {
       // No landmarks - clear alert and reset timer
-      setCurrentAlert(null);
-      setIsExercising(false);
+      if (currentAlertTypeRef.current !== null) {
+        setCurrentAlert(null);
+        currentAlertTypeRef.current = null;
+      }
+      if (isExercisingRef.current) {
+        setIsExercising(false);
+        isExercisingRef.current = false;
+      }
       badPostureStartRef.current = null;
       pendingAlertRef.current = null;
       return;
     }
 
-    const alert = getAlert(landmarks);
+    const { alert, exercising } = getAlertAndExerciseState(landmarks);
     const now = Date.now();
+
+    // Update exercising state only if changed
+    if (isExercisingRef.current !== exercising) {
+      setIsExercising(exercising);
+      isExercisingRef.current = exercising;
+    }
 
     if (alert) {
       // Bad form detected
@@ -164,22 +176,24 @@ export function useExerciseAlerts(
         pendingAlertRef.current = alert;
       } else if (now - badPostureStartRef.current >= ALERT_DEBOUNCE_MS) {
         // Bad form has persisted long enough - show alert
-        if (!currentAlert || currentAlert.type !== alert.type) {
+        if (currentAlertTypeRef.current !== alert.type) {
           // New alert or different type - play sound
           setCurrentAlert(alert);
+          currentAlertTypeRef.current = alert.type;
           playAlertSound();
-        } else {
-          // Same alert type - just update (no sound)
-          setCurrentAlert(alert);
         }
+        // If same alert type, don't update state (prevents re-renders)
       }
     } else {
       // Form is good - clear alert immediately
-      setCurrentAlert(null);
+      if (currentAlertTypeRef.current !== null) {
+        setCurrentAlert(null);
+        currentAlertTypeRef.current = null;
+      }
       badPostureStartRef.current = null;
       pendingAlertRef.current = null;
     }
-  }, [landmarks, currentAlert, playAlertSound, getAlert]);
+  }, [landmarks, playAlertSound, getAlertAndExerciseState]);
 
   // Cleanup audio context on unmount
   useEffect(() => {

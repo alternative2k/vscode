@@ -1,7 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\ndocs: initialize FormCheck\n\nWeb app for exercise form feedback with camera-based body tracking.\n\nCreates PROJECT.md with requirements and constraints.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Skill(gsd:research-project)",
+      "Skill(gsd:research-project:*)",
+      "Bash(git commit:*)",
+      "Bash(git tag:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run dev:*)"
     ]
   }
 }

@@ -43,14 +43,15 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 
 #### Phase 7: Storage Migration
 
-**Goal**: Replace S3 with secure frontend-compatible storage (Cloudflare R2 or Supabase Storage)
+**Goal**: Replace S3 with secure Cloudflare R2 using presigned URLs (credentials stay server-side)
 **Depends on**: Phase 6 (S3 Upload foundation)
-**Research**: Likely (new service integration)
-**Research topics**: Cloudflare R2 vs Supabase Storage, direct upload auth patterns, free tier limits
-**Plans**: TBD
+**Research**: Complete (07-RESEARCH.md)
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 07-01: TBD (run /gsd:plan-phase 7 to break down)
+- [ ] 07-01: Backend + Types Foundation (Pages Function, cloud types)
+- [ ] 07-02: Upload Infrastructure (cloudUpload utility, useCloudUpload hook)
+- [ ] 07-03: UI Integration (CloudConfigModal, wire into existing components)
 
 #### Phase 8: Continuous Recording
 
@@ -83,6 +84,6 @@ Plans:
 | 4. Exercise Alerts | v1.0 | 2/2 | Complete | 2026-01-16 |
 | 5. Recording History | v1.1 | 2/2 | Complete | 2026-01-16 |
 | 6. S3 Upload | v2.0 | 2/2 | Complete | 2026-01-16 |
-| 7. Storage Migration | v2.1 | 0/? | Not started | - |
+| 7. Storage Migration | v2.1 | 0/3 | Planned | - |
 | 8. Continuous Recording | v2.1 | 0/? | Not started | - |
 | 9. Dual Recording Mode | v2.1 | 0/? | Not started | - |

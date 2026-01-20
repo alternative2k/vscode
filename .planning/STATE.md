@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-16)
 
 **Core value:** Real-time visual feedback on exercise form — skeleton overlay and posture alerts must work reliably
-**Current focus:** Cloud backup with S3 upload
+**Current focus:** Continuous cloud recording with secure storage
 
 ## Current Position
 
-Phase: 6 of 6 (S3 Upload)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-16 — Completed 06-01-PLAN.md
+Phase: 7 of 9 (Storage Migration)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-01-20 — Milestone v2.1 created
 
-Progress: ████████░░ 92%
+Progress: ██████░░░░ 67%
 
 ## Performance Metrics
 
@@ -52,9 +52,10 @@ None.
 
 - Milestone v1.1 created: Recording History, 1 phase (Phase 5)
 - Milestone v2.0 created: Cloud Backup, 1 phase (Phase 6)
+- Milestone v2.1 created: Continuous Cloud Recording, 3 phases (Phases 7-9)
 
 ## Session Continuity
 
-Last session: 2026-01-16
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-01-20
+Stopped at: Milestone v2.1 initialization
 Resume file: None

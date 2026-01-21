@@ -6,6 +6,7 @@ import { useRecording } from '../hooks/useRecording';
 import { useRecordingHistory } from '../hooks/useRecordingHistory';
 import { useCloudUpload } from '../hooks/useCloudUpload';
 import { useContinuousRecording } from '../hooks/useContinuousRecording';
+import { useFullscreen } from '../hooks/useFullscreen';
 import { uploadToCloud } from '../utils/cloudUpload';
 import { PoseCanvas } from './PoseCanvas';
 import { AlertOverlay } from './AlertOverlay';
@@ -16,6 +17,7 @@ import { CloudConfigModal } from './CloudConfigModal';
 export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
   const { landmarks, isDetecting } = usePoseDetection(videoRef, facingMode);
+  const { isFullscreen, toggleFullscreen, isSupported: fullscreenSupported } = useFullscreen();
 
   // Exercise mode state
   const [exerciseMode, setExerciseMode] = useState<ExerciseMode>('general');
@@ -71,15 +73,35 @@ export function CameraPreview() {
     }
   }, [recording, saveRecording]);
 
+  // Manual upload state
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+
+  // Wrapper to reset upload state when starting new recording
+  const handleStartRecording = useCallback(() => {
+    setUploadError(null);
+    setUploadSuccess(false);
+    startRecording();
+  }, [startRecording]);
+
   // Handle direct upload of manual recording to cloud
   const handleUploadRecording = useCallback(async () => {
     if (!recording || !cloudEnabled) return;
     setIsUploadingManual(true);
+    setUploadError(null);
+    setUploadSuccess(false);
     try {
       // Generate filename for the upload
       const timestamp = recording.timestamp.getTime();
       const fileName = `manual/formcheck-${timestamp}.webm`;
-      await uploadToCloud(recording.blob, fileName);
+      const result = await uploadToCloud(recording.blob, fileName);
+      if (result.success) {
+        setUploadSuccess(true);
+      } else {
+        setUploadError(result.error || 'Upload failed');
+      }
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       setIsUploadingManual(false);
     }
@@ -353,7 +375,7 @@ export function CameraPreview() {
         state={recordingState}
         recording={recording}
         duration={duration}
-        onStart={startRecording}
+        onStart={handleStartRecording}
         onStop={stopRecording}
         onSave={handleSaveRecording}
         onShowHistory={handleShowHistory}
@@ -362,6 +384,8 @@ export function CameraPreview() {
         onUpload={handleUploadRecording}
         isUploading={isUploadingManual}
         cloudEnabled={cloudEnabled}
+        uploadError={uploadError}
+        uploadSuccess={uploadSuccess}
       />
 
       {/* Recording list modal */}
@@ -388,24 +412,74 @@ export function CameraPreview() {
         onDisable={disableCloud}
       />
 
-      {/* Camera switch button - positioned for thumb reach on mobile */}
-      <button
-        onClick={toggleCamera}
-        className="absolute bottom-6 right-4 md:bottom-4 bg-gray-800/80 hover:bg-gray-700/90 active:bg-gray-600/90 text-white p-3 rounded-full transition-colors shadow-lg"
-        style={{ minWidth: '48px', minHeight: '48px' }}
-        aria-label="Switch camera"
-        title="Switch camera"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="w-6 h-6"
+      {/* Bottom-right control buttons container */}
+      <div className="absolute bottom-6 right-4 md:bottom-4 flex flex-col gap-3">
+        {/* Fullscreen toggle button - only show if supported */}
+        {fullscreenSupported && (
+          <button
+            onClick={toggleFullscreen}
+            className="bg-gray-800/80 hover:bg-gray-700/90 active:bg-gray-600/90 text-white p-3 rounded-full transition-colors shadow-lg"
+            style={{ minWidth: '48px', minHeight: '48px' }}
+            aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+            title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          >
+            {isFullscreen ? (
+              // Compress icon (exit fullscreen)
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-6 h-6"
+              >
+                <path d="M8 3v3a2 2 0 01-2 2H3" />
+                <path d="M21 8h-3a2 2 0 01-2-2V3" />
+                <path d="M3 16h3a2 2 0 012 2v3" />
+                <path d="M16 21v-3a2 2 0 012-2h3" />
+              </svg>
+            ) : (
+              // Expand icon (enter fullscreen)
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-6 h-6"
+              >
+                <path d="M8 3H5a2 2 0 00-2 2v3" />
+                <path d="M21 8V5a2 2 0 00-2-2h-3" />
+                <path d="M3 16v3a2 2 0 002 2h3" />
+                <path d="M16 21h3a2 2 0 002-2v-3" />
+              </svg>
+            )}
+          </button>
+        )}
+
+        {/* Camera switch button */}
+        <button
+          onClick={toggleCamera}
+          className="bg-gray-800/80 hover:bg-gray-700/90 active:bg-gray-600/90 text-white p-3 rounded-full transition-colors shadow-lg"
+          style={{ minWidth: '48px', minHeight: '48px' }}
+          aria-label="Switch camera"
+          title="Switch camera"
         >
-          <path d="M9 3h6l2 2h4a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V6a1 1 0 011-1h4l2-2zm3 15a5 5 0 100-10 5 5 0 000 10zm0-2a3 3 0 110-6 3 3 0 010 6z" />
-          <path d="M16.5 8.5l-2 2m0-2l2 2" strokeWidth="1.5" stroke="currentColor" fill="none" />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-6 h-6"
+          >
+            <path d="M9 3h6l2 2h4a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V6a1 1 0 011-1h4l2-2zm3 15a5 5 0 100-10 5 5 0 000 10zm0-2a3 3 0 110-6 3 3 0 010 6z" />
+            <path d="M16.5 8.5l-2 2m0-2l2 2" strokeWidth="1.5" stroke="currentColor" fill="none" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }

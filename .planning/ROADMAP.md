@@ -9,7 +9,7 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 - ✅ **v1.0 MVP** - [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) (Phases 1-4, shipped 2026-01-16)
 - ✅ **v1.1 Recording History** - [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) (Phase 5, shipped 2026-01-16)
 - ✅ **v2.0 Cloud Backup** - [milestones/v2.0-ROADMAP.md](milestones/v2.0-ROADMAP.md) (Phase 6, shipped 2026-01-16) ⚠️ Known limitation: requires backend for secure uploads
-- 🚧 **v2.1 Continuous Cloud Recording** - Phases 7-9 (in progress)
+- ✅ **v2.1 Continuous Cloud Recording** - [milestones/v2.1-ROADMAP.md](milestones/v2.1-ROADMAP.md) (Phases 7-9, shipped 2026-01-21)
 
 ## Completed Milestones
 
@@ -37,43 +37,14 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 
 </details>
 
-### 🚧 v2.1 Continuous Cloud Recording (In Progress)
+<details>
+<summary>v2.1 Continuous Cloud Recording (Phases 7-9) — SHIPPED 2026-01-21</summary>
 
-**Milestone Goal:** Continuous background recording with secure cloud uploads, efficient video format, and graceful page refresh handling. Manual recording coexists without interference.
+- [x] Phase 7: Storage Migration (3/3 plans) — completed 2026-01-20
+- [x] Phase 8: Continuous Recording (3/3 plans) — completed 2026-01-21
+- [x] Phase 9: Dual Recording Mode (1/1 plan) — completed 2026-01-21
 
-#### Phase 7: Storage Migration ✅
-
-**Goal**: Replace S3 with secure Cloudflare R2 using presigned URLs (credentials stay server-side)
-**Depends on**: Phase 6 (S3 Upload foundation)
-**Research**: Complete (07-RESEARCH.md)
-**Plans**: 3 plans in 3 waves — completed 2026-01-20
-
-Plans:
-- [x] 07-01: Backend + Types Foundation (Pages Function, cloud types)
-- [x] 07-02: Upload Infrastructure (cloudUpload utility, useCloudUpload hook)
-- [x] 07-03: UI Integration (CloudConfigModal, wire into existing components)
-
-#### Phase 8: Continuous Recording ✅
-
-**Goal**: Background MediaRecorder with chunked uploads, page unload handling, efficient format (WebM/VP9)
-**Depends on**: Phase 7
-**Research**: Complete (08-RESEARCH.md)
-**Plans**: 3 plans in 3 waves — completed 2026-01-21
-
-Plans:
-- [x] 08-01: Chunk Storage Infrastructure (types, chunkStorage.ts)
-- [x] 08-02: useContinuousRecording Hook (MediaRecorder, visibilitychange, upload)
-- [x] 08-03: UI Integration (toggle button, status indicator, human verification)
-
-#### Phase 9: Dual Recording Mode
-
-**Goal**: Manual record button for local clips with optional upload, independent from background stream
-**Depends on**: Phase 8
-**Research**: Unlikely (internal patterns, extends existing recording)
-**Plans**: TBD
-
-Plans:
-- [ ] 09-01: TBD
+</details>
 
 ## Progress
 
@@ -87,4 +58,4 @@ Plans:
 | 6. S3 Upload | v2.0 | 2/2 | Complete | 2026-01-16 |
 | 7. Storage Migration | v2.1 | 3/3 | Complete | 2026-01-20 |
 | 8. Continuous Recording | v2.1 | 3/3 | Complete | 2026-01-21 |
-| 9. Dual Recording Mode | v2.1 | 0/? | Not started | - |
+| 9. Dual Recording Mode | v2.1 | 1/1 | Complete | 2026-01-21 |

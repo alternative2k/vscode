@@ -1,5 +1,33 @@
 # Project Milestones: FormCheck
 
+## v2.1 Continuous Cloud Recording (Shipped: 2026-01-21)
+
+**Delivered:** Continuous background recording with secure cloud uploads — video chunks saved progressively and uploaded automatically when leaving page. Manual recording works independently with direct upload option.
+
+**Phases completed:** 7-9 (7 plans total)
+
+**Key accomplishments:**
+
+- Secure cloud uploads via Cloudflare R2 with presigned URLs (no client-side credentials)
+- Cloudflare Pages Function for server-side credential management
+- Continuous background recording with 5-second chunks saved to IndexedDB
+- Automatic upload on page exit via visibilitychange handling
+- Manual recording coexists independently with continuous background
+- Direct upload button (purple) for manual clips with success/error feedback
+
+**Stats:**
+
+- 8 files created, 6 modified
+- 5,104 total lines of TypeScript
+- 3 phases, 7 plans, ~14 tasks
+- 2 days (2026-01-20 → 2026-01-21)
+
+**Git range:** `feat(07-01)` → `feat(09-01)`
+
+**What's next:** TBD
+
+---
+
 ## v1.1 Recording History (Shipped: 2026-01-16)
 
 **Delivered:** Local recording management with IndexedDB persistence — view past recordings and delete to free space.

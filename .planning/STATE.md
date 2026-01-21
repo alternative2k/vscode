@@ -2,10 +2,10 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-16)
+See: .planning/PROJECT.md (updated 2026-01-21)
 
 **Core value:** Real-time visual feedback on exercise form — skeleton overlay and posture alerts must work reliably
-**Current focus:** Continuous cloud recording with secure storage
+**Current focus:** v2.1 complete — planning next milestone
 
 ## Current Position
 
@@ -55,7 +55,7 @@ None.
 
 - Milestone v1.1 created: Recording History, 1 phase (Phase 5)
 - Milestone v2.0 created: Cloud Backup, 1 phase (Phase 6)
-- Milestone v2.1 created: Continuous Cloud Recording, 3 phases (Phases 7-9)
+- Milestone v2.1 shipped: Continuous Cloud Recording, 3 phases (Phases 7-9) — 2026-01-21
 
 ## Session Continuity
 

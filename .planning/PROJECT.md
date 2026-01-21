@@ -10,11 +10,11 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 
 ## Current State
 
-**Shipped:** v1.1 Recording History (2026-01-16)
+**Shipped:** v2.1 Continuous Cloud Recording (2026-01-21)
 
-- 2,774 lines TypeScript across 19 files
-- Tech stack: Vite, React, TypeScript, Tailwind CSS v4, MediaPipe Pose
-- Deployable as static site to Vercel/Netlify/GitHub Pages
+- 5,104 lines TypeScript across 27 files
+- Tech stack: Vite, React, TypeScript, Tailwind CSS v4, MediaPipe Pose, Cloudflare Pages/R2
+- Deployable to Cloudflare Pages (or static hosting with serverless backend)
 
 **Working features:**
 - Camera access with front/back switching
@@ -26,6 +26,10 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 - Recording history with IndexedDB persistence
 - Password protection for small group access
 - Responsive mobile-first layout
+- Secure cloud uploads via Cloudflare R2 (presigned URLs, no client credentials)
+- Continuous background recording with progressive chunk saving
+- Automatic upload on page exit (visibilitychange handling)
+- Manual recording works independently with direct upload option
 
 ## Requirements
 
@@ -42,14 +46,17 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 - ✓ Simple authentication for small group access — v1.0
 - ✓ Modern, clean UI that works on desktop and mobile — v1.0
 - ✓ Deployable to free/cheap static hosting — v1.0
+- ✓ Secure cloud uploads (presigned URLs, no client credentials) — v2.1
+- ✓ Continuous background recording with auto-upload — v2.1
+- ✓ Manual recording independent of continuous mode — v2.1
 
 ### Active
 
-- [ ] Upload to user-configured S3 storage
+(None — all current requirements shipped)
 
 ### Out of Scope
 
-- Backend storage (users provide their own S3) — keeps hosting costs zero
+- Client-side credential storage — presigned URLs keep credentials server-side
 - Complex user management (simple auth only) — small group doesn't need it
 - Overlay burned into recordings — user wants clean video files
 - Rep counting or joint angle stats — posture alerts are the focus
@@ -79,7 +86,11 @@ S3 upload (deferred to v2) means users would configure their own bucket credenti
 | 500ms debounce on alerts | Prevents flicker without feeling laggy | ✓ Good |
 | 100° thresholds for squat/pushup depth | Balances sensitivity with false positives | ✓ Good |
 | Side-view recommendation for push-ups | Better body line detection from side angle | ✓ Good |
-| User-configured S3 for uploads | Zero storage costs, users own their data | — Deferred to v2 |
+| Cloudflare R2 with presigned URLs | Server-side credentials, no client exposure | ✓ Good |
+| aws4fetch for signing in Workers | AWS SDK v3 not compatible with Workers runtime | ✓ Good |
+| 5-second chunk timeslice | Balance between request frequency and data at risk | ✓ Good |
+| visibilitychange for page exit | More reliable than beforeunload | ✓ Good |
+| Separate IndexedDB for chunks | Isolates continuous recording from manual recordings | ✓ Good |
 | Live overlay only, clean recordings | Simpler implementation, more flexible output | ✓ Good |
 | Client-side pose detection | No backend needed, free hosting, privacy | ✓ Good |
 | Web app over native | Single codebase covers laptop + mobile | ✓ Good |
@@ -88,4 +99,4 @@ S3 upload (deferred to v2) means users would configure their own bucket credenti
 | Modal overlay with click-to-close | Intuitive UX for recording history | ✓ Good |
 
 ---
-*Last updated: 2026-01-16 after v1.1 milestone*
+*Last updated: 2026-01-21 after v2.1 milestone*

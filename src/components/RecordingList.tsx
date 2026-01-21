@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { StoredRecording } from '../types/recording';
-import type { S3Config } from '../types/s3';
-import type { UploadItem } from '../hooks/useS3Upload';
+import type { UploadItem } from '../hooks/useCloudUpload';
 
 // Format bytes to human-readable size
 function formatFileSize(bytes: number): string {
@@ -38,8 +37,8 @@ interface RecordingListProps {
   onDelete: (id: number) => Promise<void>;
   storageStats: { count: number; totalSize: number };
   isLoading: boolean;
-  // S3 upload props
-  s3Config: S3Config | null;
+  // Cloud upload props
+  cloudEnabled: boolean;
   uploads: UploadItem[];
   onUpload: (recording: StoredRecording) => void;
   onRetry: (id: number, recording: StoredRecording) => void;
@@ -53,7 +52,7 @@ export function RecordingList({
   onDelete,
   storageStats,
   isLoading,
-  s3Config,
+  cloudEnabled,
   uploads,
   onUpload,
   onRetry,
@@ -120,15 +119,15 @@ export function RecordingList({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            {/* Configure S3 button */}
+            {/* Cloud settings button */}
             <button
               onClick={onConfigClick}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-              title={s3Config ? 'S3 configured' : 'Configure S3 for cloud backup'}
+              title={cloudEnabled ? 'Cloud upload enabled' : 'Configure cloud backup'}
             >
-              {s3Config ? (
+              {cloudEnabled ? (
                 <>
-                  {/* Green checkmark when configured */}
+                  {/* Green checkmark when enabled */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
@@ -141,11 +140,11 @@ export function RecordingList({
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>S3</span>
+                  <span>Cloud</span>
                 </>
               ) : (
                 <>
-                  {/* Gear icon when not configured */}
+                  {/* Cloud icon when not enabled */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
@@ -154,11 +153,11 @@ export function RecordingList({
                   >
                     <path
                       fillRule="evenodd"
-                      d="M7.84 1.804A1 1 0 018.82 1h2.36a1 1 0 01.98.804l.331 1.652a6.993 6.993 0 011.929 1.115l1.598-.54a1 1 0 011.186.447l1.18 2.044a1 1 0 01-.205 1.251l-1.267 1.113a7.047 7.047 0 010 2.228l1.267 1.113a1 1 0 01.206 1.25l-1.18 2.045a1 1 0 01-1.187.447l-1.598-.54a6.993 6.993 0 01-1.929 1.115l-.33 1.652a1 1 0 01-.98.804H8.82a1 1 0 01-.98-.804l-.331-1.652a6.993 6.993 0 01-1.929-1.115l-1.598.54a1 1 0 01-1.186-.447l-1.18-2.044a1 1 0 01.205-1.251l1.267-1.113a7.047 7.047 0 010-2.228L1.821 7.773a1 1 0 01-.206-1.25l1.18-2.045a1 1 0 011.187-.447l1.598.54A6.993 6.993 0 017.51 3.456l.33-1.652zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                      d="M5.5 17a4.5 4.5 0 01-1.44-8.765 4.5 4.5 0 018.302-3.046 3.5 3.5 0 014.504 4.272A4 4 0 0115 17H5.5zm3.75-2.75a.75.75 0 001.5 0V9.66l1.95 2.1a.75.75 0 101.1-1.02l-3.25-3.5a.75.75 0 00-1.1 0l-3.25 3.5a.75.75 0 101.1 1.02l1.95-2.1v4.59z"
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>Configure S3</span>
+                  <span>Cloud Settings</span>
                 </>
               )}
             </button>
@@ -242,13 +241,13 @@ export function RecordingList({
                     {(() => {
                       const upload = getUploadForRecording(rec.id);
 
-                      // No S3 config - show disabled upload button
-                      if (!s3Config) {
+                      // Cloud not enabled - show disabled upload button
+                      if (!cloudEnabled) {
                         return (
                           <button
                             disabled
                             className="p-2 text-gray-500 cursor-not-allowed"
-                            title="Configure S3 first"
+                            title="Enable cloud upload first"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -327,7 +326,7 @@ export function RecordingList({
                         <button
                           onClick={() => onUpload(rec)}
                           className="p-2 text-gray-400 hover:text-blue-400 rounded-full hover:bg-gray-700 transition-colors"
-                          title="Upload to S3"
+                          title="Upload to cloud"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

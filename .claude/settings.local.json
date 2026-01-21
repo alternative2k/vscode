@@ -10,7 +10,14 @@
       "Bash(git tag:*)",
       "Bash(npm run build:*)",
       "Bash(npm run lint)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npx tsc --noEmit)",
+      "Skill(gsd:research-phase)",
+      "Skill(gsd:research-phase:*)",
+      "Bash(ls:*)",
+      "Read(//c/Users/seann/.claude/get-shit-done/templates/**)",
+      "Bash(git stash:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }

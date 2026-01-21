@@ -33,6 +33,8 @@ interface RecordingControlsProps {
   onUpload?: () => void;
   isUploading?: boolean;
   cloudEnabled?: boolean;
+  uploadError?: string | null;
+  uploadSuccess?: boolean;
 }
 
 export function RecordingControls({
@@ -48,6 +50,8 @@ export function RecordingControls({
   onUpload,
   isUploading = false,
   cloudEnabled = false,
+  uploadError = null,
+  uploadSuccess = false,
 }: RecordingControlsProps) {
   // Download the recorded video
   const handleDownload = useCallback(() => {
@@ -167,14 +171,48 @@ export function RecordingControls({
         {state === 'stopped' && recording && cloudEnabled && onUpload && (
           <button
             onClick={onUpload}
-            disabled={isUploading}
-            className="p-3 rounded-full transition-colors shadow-lg bg-violet-600/90 hover:bg-violet-500/90 active:bg-violet-400/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isUploading || uploadSuccess}
+            className={`p-3 rounded-full transition-colors shadow-lg text-white disabled:cursor-not-allowed ${
+              uploadSuccess
+                ? 'bg-green-600/90'
+                : uploadError
+                  ? 'bg-red-600/90 hover:bg-red-500/90 active:bg-red-400/90'
+                  : 'bg-violet-600/90 hover:bg-violet-500/90 active:bg-violet-400/90'
+            } ${isUploading ? 'opacity-50' : ''}`}
             style={{ minWidth: '48px', minHeight: '48px' }}
-            aria-label="Upload to cloud"
-            title="Upload to cloud"
+            aria-label={uploadError ? `Upload failed: ${uploadError}` : uploadSuccess ? 'Upload complete' : 'Upload to cloud'}
+            title={uploadError ? `Upload failed: ${uploadError}. Click to retry.` : uploadSuccess ? 'Upload complete' : 'Upload to cloud'}
           >
             {isUploading ? (
               <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : uploadSuccess ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6"
+              >
+                {/* Checkmark icon */}
+                <path
+                  fillRule="evenodd"
+                  d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            ) : uploadError ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6"
+              >
+                {/* Exclamation icon */}
+                <path
+                  fillRule="evenodd"
+                  d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                  clipRule="evenodd"
+                />
+              </svg>
             ) : (
               <svg
                 xmlns="http://www.w3.org/2000/svg"

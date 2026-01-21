@@ -41,28 +41,29 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 
 **Milestone Goal:** Continuous background recording with secure cloud uploads, efficient video format, and graceful page refresh handling. Manual recording coexists without interference.
 
-#### Phase 7: Storage Migration
+#### Phase 7: Storage Migration ✅
 
 **Goal**: Replace S3 with secure Cloudflare R2 using presigned URLs (credentials stay server-side)
 **Depends on**: Phase 6 (S3 Upload foundation)
 **Research**: Complete (07-RESEARCH.md)
-**Plans**: 3 plans in 3 waves
+**Plans**: 3 plans in 3 waves — completed 2026-01-20
 
 Plans:
-- [ ] 07-01: Backend + Types Foundation (Pages Function, cloud types)
-- [ ] 07-02: Upload Infrastructure (cloudUpload utility, useCloudUpload hook)
-- [ ] 07-03: UI Integration (CloudConfigModal, wire into existing components)
+- [x] 07-01: Backend + Types Foundation (Pages Function, cloud types)
+- [x] 07-02: Upload Infrastructure (cloudUpload utility, useCloudUpload hook)
+- [x] 07-03: UI Integration (CloudConfigModal, wire into existing components)
 
-#### Phase 8: Continuous Recording
+#### Phase 8: Continuous Recording ✅
 
 **Goal**: Background MediaRecorder with chunked uploads, page unload handling, efficient format (WebM/VP9)
 **Depends on**: Phase 7
-**Research**: Likely (chunked upload patterns, page lifecycle)
-**Research topics**: MediaRecorder chunking, beforeunload/visibilitychange handling, WebM vs MP4 streaming
-**Plans**: TBD
+**Research**: Complete (08-RESEARCH.md)
+**Plans**: 3 plans in 3 waves — completed 2026-01-21
 
 Plans:
-- [ ] 08-01: TBD
+- [x] 08-01: Chunk Storage Infrastructure (types, chunkStorage.ts)
+- [x] 08-02: useContinuousRecording Hook (MediaRecorder, visibilitychange, upload)
+- [x] 08-03: UI Integration (toggle button, status indicator, human verification)
 
 #### Phase 9: Dual Recording Mode
 
@@ -84,6 +85,6 @@ Plans:
 | 4. Exercise Alerts | v1.0 | 2/2 | Complete | 2026-01-16 |
 | 5. Recording History | v1.1 | 2/2 | Complete | 2026-01-16 |
 | 6. S3 Upload | v2.0 | 2/2 | Complete | 2026-01-16 |
-| 7. Storage Migration | v2.1 | 0/3 | Planned | - |
-| 8. Continuous Recording | v2.1 | 0/? | Not started | - |
+| 7. Storage Migration | v2.1 | 3/3 | Complete | 2026-01-20 |
+| 8. Continuous Recording | v2.1 | 3/3 | Complete | 2026-01-21 |
 | 9. Dual Recording Mode | v2.1 | 0/? | Not started | - |

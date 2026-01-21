@@ -62,10 +62,10 @@ export function RecordingControls({
 
   return (
     <>
-      {/* Recording indicator at top-right */}
+      {/* Recording indicator at top-center */}
       {state === 'recording' && (
-        <div className="absolute top-4 right-4">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-red-600/90 text-white">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-red-600/90 text-white shadow-lg">
             <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
             <span>REC</span>
             <span className="font-mono">{formatDuration(duration)}</span>

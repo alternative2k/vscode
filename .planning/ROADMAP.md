@@ -10,7 +10,7 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 - ✅ **v1.1 Recording History** - [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) (Phase 5, shipped 2026-01-16)
 - ✅ **v2.0 Cloud Backup** - [milestones/v2.0-ROADMAP.md](milestones/v2.0-ROADMAP.md) (Phase 6, shipped 2026-01-16) ⚠️ Known limitation: requires backend for secure uploads
 - ✅ **v2.1 Continuous Cloud Recording** - [milestones/v2.1-ROADMAP.md](milestones/v2.1-ROADMAP.md) (Phases 7-9, shipped 2026-01-21)
-- 🚧 **v2.2 UX Polish** - Phases 10-11 (in progress)
+- ✅ **v2.2 UX Polish** - [milestones/v2.2-ROADMAP.md](milestones/v2.2-ROADMAP.md) (Phases 10-11, shipped 2026-01-21)
 
 ## Completed Milestones
 
@@ -47,30 +47,13 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 
 </details>
 
-### 🚧 v2.2 UX Polish (In Progress)
+<details>
+<summary>v2.2 UX Polish (Phases 10-11) — SHIPPED 2026-01-21</summary>
 
-**Milestone Goal:** Improve mobile workout experience and make form feedback more visible and informative during active exercise.
+- [x] Phase 10: Mobile UX (1/1 plan) — completed 2026-01-21
+- [x] Phase 11: Alert System Overhaul (2/2 plans) — completed 2026-01-21
 
-#### Phase 10: Mobile UX
-
-**Goal**: Add fullscreen mode and better orientation handling for mobile workouts
-**Depends on**: Phase 9
-**Research**: Unlikely (standard web APIs)
-**Plans**: 1 plan
-
-Plans:
-- [ ] 10-01: Fullscreen mode and orientation handling
-
-#### Phase 11: Alert System Overhaul
-
-**Goal**: Make alerts more prominent with position feedback on skeleton and severity color-coding
-**Depends on**: Phase 10
-**Research**: Unlikely (internal UI patterns)
-**Plans**: 2 plans
-
-Plans:
-- [x] 11-01: Add affectedLandmarks to alert types
-- [ ] 11-02: Severity-based skeleton highlighting and alert colors
+</details>
 
 ## Progress
 
@@ -86,4 +69,4 @@ Plans:
 | 8. Continuous Recording | v2.1 | 3/3 | Complete | 2026-01-21 |
 | 9. Dual Recording Mode | v2.1 | 1/1 | Complete | 2026-01-21 |
 | 10. Mobile UX | v2.2 | 1/1 | Complete | 2026-01-21 |
-| 11. Alert System Overhaul | v2.2 | 1/2 | In progress | - |
+| 11. Alert System Overhaul | v2.2 | 2/2 | Complete | 2026-01-21 |

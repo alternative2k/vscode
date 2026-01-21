@@ -58,7 +58,7 @@ None.
 - Milestone v1.1 created: Recording History, 1 phase (Phase 5)
 - Milestone v2.0 created: Cloud Backup, 1 phase (Phase 6)
 - Milestone v2.1 shipped: Continuous Cloud Recording, 3 phases (Phases 7-9) — 2026-01-21
-- Milestone v2.2 created: UX Polish, 2 phases (Phases 10-11) — 2026-01-21
+- Milestone v2.2 shipped: UX Polish, 2 phases (Phases 10-11) — 2026-01-21
 
 ## Session Continuity
 

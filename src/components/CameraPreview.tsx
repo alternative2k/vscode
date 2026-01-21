@@ -198,9 +198,28 @@ export function CameraPreview() {
     if (video && video.videoWidth > 0 && video.videoHeight > 0) {
       // Use the actual rendered size of the video element
       const rect = video.getBoundingClientRect();
-      setVideoDimensions({ width: rect.width, height: rect.height });
+      if (rect.width > 0 && rect.height > 0) {
+        setVideoDimensions({ width: rect.width, height: rect.height });
+      }
     }
   }, [videoRef]);
+
+  // Fallback: poll for dimensions when stream is available but dimensions are zero
+  useEffect(() => {
+    if (!stream || videoDimensions.width > 0) return;
+
+    const interval = setInterval(() => {
+      updateDimensions();
+    }, 100);
+
+    // Stop polling after 5 seconds
+    const timeout = setTimeout(() => clearInterval(interval), 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [stream, videoDimensions.width, updateDimensions]);
 
   // Set video source when stream changes
   useEffect(() => {
@@ -216,6 +235,8 @@ export function CameraPreview() {
 
     // Update on loadedmetadata
     video.addEventListener('loadedmetadata', updateDimensions);
+    // Also listen for 'playing' event in case metadata already fired
+    video.addEventListener('playing', updateDimensions);
 
     // Also update on resize (handles responsive layout changes)
     const resizeObserver = new ResizeObserver(updateDimensions);
@@ -226,6 +247,7 @@ export function CameraPreview() {
 
     return () => {
       video.removeEventListener('loadedmetadata', updateDimensions);
+      video.removeEventListener('playing', updateDimensions);
       resizeObserver.disconnect();
     };
   }, [videoRef, updateDimensions]);

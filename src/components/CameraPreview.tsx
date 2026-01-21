@@ -4,12 +4,13 @@ import { usePoseDetection } from '../hooks/usePoseDetection';
 import { useExerciseAlerts, ExerciseMode } from '../hooks/useExerciseAlerts';
 import { useRecording } from '../hooks/useRecording';
 import { useRecordingHistory } from '../hooks/useRecordingHistory';
-import { useS3Upload } from '../hooks/useS3Upload';
+import { useCloudUpload } from '../hooks/useCloudUpload';
+import { useContinuousRecording } from '../hooks/useContinuousRecording';
 import { PoseCanvas } from './PoseCanvas';
 import { AlertOverlay } from './AlertOverlay';
 import { RecordingControls } from './RecordingControls';
 import { RecordingList } from './RecordingList';
-import { S3ConfigModal } from './S3ConfigModal';
+import { CloudConfigModal } from './CloudConfigModal';
 
 export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
@@ -34,16 +35,28 @@ export function CameraPreview() {
   const [showRecordingList, setShowRecordingList] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // S3 upload
+  // Cloud upload
   const {
-    config: s3Config,
-    saveConfig: saveS3Config,
-    clearConfig: clearS3Config,
+    isConfigured: cloudEnabled,
+    enableCloud,
+    disableCloud,
     uploads,
     uploadRecording,
     retryUpload,
-  } = useS3Upload();
-  const [showS3Config, setShowS3Config] = useState(false);
+  } = useCloudUpload();
+  const [showCloudConfig, setShowCloudConfig] = useState(false);
+
+  // Continuous recording
+  const {
+    state: continuousState,
+    isEnabled: continuousEnabled,
+    duration: continuousDuration,
+    chunkCount,
+    uploadProgress,
+    enable: enableContinuous,
+    disable: disableContinuous,
+    error: continuousError,
+  } = useContinuousRecording(stream);
 
   // Handle save recording to IndexedDB
   const handleSaveRecording = useCallback(async () => {
@@ -65,13 +78,13 @@ export function CameraPreview() {
     setShowRecordingList(false);
   }, []);
 
-  // S3 config modal handlers
-  const handleOpenS3Config = useCallback(() => {
-    setShowS3Config(true);
+  // Cloud config modal handlers
+  const handleOpenCloudConfig = useCallback(() => {
+    setShowCloudConfig(true);
   }, []);
 
-  const handleCloseS3Config = useCallback(() => {
-    setShowS3Config(false);
+  const handleCloseCloudConfig = useCallback(() => {
+    setShowCloudConfig(false);
   }, []);
 
   // Track video dimensions for canvas sizing
@@ -287,21 +300,80 @@ export function CameraPreview() {
         onDelete={deleteRecording}
         storageStats={storageStats}
         isLoading={isHistoryLoading}
-        s3Config={s3Config}
+        cloudEnabled={cloudEnabled}
         uploads={uploads}
         onUpload={uploadRecording}
         onRetry={retryUpload}
-        onConfigClick={handleOpenS3Config}
+        onConfigClick={handleOpenCloudConfig}
       />
 
-      {/* S3 configuration modal */}
-      <S3ConfigModal
-        isOpen={showS3Config}
-        onClose={handleCloseS3Config}
-        config={s3Config}
-        onSave={saveS3Config}
-        onClear={clearS3Config}
+      {/* Cloud configuration modal */}
+      <CloudConfigModal
+        isOpen={showCloudConfig}
+        onClose={handleCloseCloudConfig}
+        isEnabled={cloudEnabled}
+        onEnable={enableCloud}
+        onDisable={disableCloud}
       />
+
+      {/* Continuous recording toggle */}
+      <div className="absolute bottom-6 left-4 md:bottom-4 flex flex-col items-start gap-2">
+        <button
+          onClick={continuousEnabled ? disableContinuous : enableContinuous}
+          disabled={continuousState === 'uploading'}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-colors shadow-lg ${
+            continuousState === 'uploading'
+              ? 'bg-yellow-600/80 text-white cursor-wait'
+              : continuousState === 'recording'
+              ? 'bg-blue-600/90 text-white hover:bg-blue-700/90'
+              : continuousEnabled
+              ? 'bg-blue-500/80 text-white hover:bg-blue-600/80'
+              : 'bg-gray-800/80 text-gray-200 hover:bg-gray-700/80 border border-gray-600'
+          }`}
+          style={{ minHeight: '44px' }}
+          title={
+            continuousState === 'uploading'
+              ? 'Uploading chunks...'
+              : continuousEnabled
+              ? 'Stop continuous recording'
+              : 'Start continuous background recording'
+          }
+        >
+          {/* Status indicator dot */}
+          {continuousState === 'recording' && (
+            <div className="w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
+          )}
+          {continuousState === 'uploading' && (
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          )}
+
+          {/* Button text */}
+          {continuousState === 'uploading'
+            ? `Uploading ${uploadProgress.uploaded}/${uploadProgress.total}`
+            : continuousEnabled
+            ? 'Stop Continuous'
+            : 'Start Continuous'}
+        </button>
+
+        {/* Duration and chunk count indicator when recording */}
+        {continuousState === 'recording' && (
+          <div className="flex items-center gap-2 px-3 py-1 bg-gray-900/80 rounded-full text-xs text-gray-200">
+            <span className="font-mono">
+              {Math.floor(continuousDuration / 60).toString().padStart(2, '0')}:
+              {(continuousDuration % 60).toString().padStart(2, '0')}
+            </span>
+            <span className="text-gray-400">|</span>
+            <span>{chunkCount} chunks</span>
+          </div>
+        )}
+
+        {/* Error indicator */}
+        {continuousError && (
+          <div className="px-3 py-1 bg-red-600/80 rounded-full text-xs text-white">
+            {continuousError}
+          </div>
+        )}
+      </div>
 
       {/* Camera switch button - positioned for thumb reach on mobile */}
       <button

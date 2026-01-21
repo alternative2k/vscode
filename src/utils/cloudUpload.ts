@@ -42,6 +42,14 @@ function delay(ms: number): Promise<void> {
 }
 
 /**
+ * Returns today's date as YYYY-MM-DD for folder organization.
+ */
+function getDateFolder(): string {
+  const now = new Date();
+  return now.toISOString().split('T')[0]; // Returns "2026-01-21"
+}
+
+/**
  * Uploads a chunk blob with session context in the filename.
  * Organizes chunks in folders by session ID on R2.
  *
@@ -57,7 +65,8 @@ export async function uploadChunk(
   chunkIndex: number,
   onProgress?: (progress: UploadProgress) => void
 ): Promise<UploadResult> {
-  const fileName = `${sessionId}/chunk-${String(chunkIndex).padStart(4, '0')}.webm`;
+  const dateFolder = getDateFolder();
+  const fileName = `${dateFolder}/${sessionId}/chunk-${String(chunkIndex).padStart(4, '0')}.webm`;
   return uploadToCloud(blob, fileName, onProgress);
 }
 

@@ -11,6 +11,7 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 - ✅ **v2.0 Cloud Backup** - [milestones/v2.0-ROADMAP.md](milestones/v2.0-ROADMAP.md) (Phase 6, shipped 2026-01-16) ⚠️ Known limitation: requires backend for secure uploads
 - ✅ **v2.1 Continuous Cloud Recording** - [milestones/v2.1-ROADMAP.md](milestones/v2.1-ROADMAP.md) (Phases 7-9, shipped 2026-01-21)
 - ✅ **v2.2 UX Polish** - [milestones/v2.2-ROADMAP.md](milestones/v2.2-ROADMAP.md) (Phases 10-11, shipped 2026-01-21)
+- 🚧 **v2.3 Continuous Recording UX** - Phases 12-14 (in progress)
 
 ## Completed Milestones
 
@@ -70,3 +71,45 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 | 9. Dual Recording Mode | v2.1 | 1/1 | Complete | 2026-01-21 |
 | 10. Mobile UX | v2.2 | 1/1 | Complete | 2026-01-21 |
 | 11. Alert System Overhaul | v2.2 | 2/2 | Complete | 2026-01-21 |
+
+### 🚧 v2.3 Continuous Recording UX (In Progress)
+
+**Milestone Goal:** Seamless continuous recording that auto-starts on camera load with visual status indicator and resilient upload handling.
+
+#### Phase 12: Auto-Start Recording
+
+**Goal**: Auto-start continuous recording when camera preview loads, stop on close/refresh
+**Depends on**: Phase 8 (Continuous Recording infrastructure)
+**Research**: Unlikely (building on existing continuous recording)
+**Plans**: TBD
+
+Plans:
+- [ ] 12-01: TBD (run /gsd:plan-phase 12 to break down)
+
+#### Phase 13: Status Indicator
+
+**Goal**: Replace continuous recording button with status icon (green=active, yellow=retrying, grey=inactive)
+**Depends on**: Phase 12
+**Research**: Unlikely (UI component work)
+**Plans**: TBD
+
+Plans:
+- [ ] 13-01: TBD
+
+#### Phase 14: Resilient Upload
+
+**Goal**: Auto-retry uploads with reconnection handling, organize by date folders (2026-01-21/session-abc/chunk-0001.webm)
+**Depends on**: Phase 12
+**Research**: Unlikely (extending existing upload logic)
+**Plans**: TBD
+
+Plans:
+- [ ] 14-01: TBD
+
+## Progress (v2.3)
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 12. Auto-Start Recording | v2.3 | 0/? | Not started | - |
+| 13. Status Indicator | v2.3 | 0/? | Not started | - |
+| 14. Resilient Upload | v2.3 | 0/? | Not started | - |

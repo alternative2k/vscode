@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-21)
 
 **Core value:** Real-time visual feedback on exercise form — skeleton overlay and posture alerts must work reliably
-**Current focus:** Planning next milestone
+**Current focus:** v2.3 Continuous Recording UX — seamless auto-start with status indicator
 
 ## Current Position
 
-Phase: All phases complete
-Plan: N/A
-Status: Ready for next milestone
-Last activity: 2026-01-21 — v2.2 milestone complete
+Phase: 12 of 14 (Auto-Start Recording)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-01-21 — Milestone v2.3 created
 
-Progress: ██████████ 100% (11 phases, 22 plans)
+Progress: ░░░░░░░░░░ 0%
 
 ## Performance Metrics
 
@@ -60,9 +60,10 @@ None.
 - Milestone v2.0 shipped: Cloud Backup (Phase 6) — 2026-01-16
 - Milestone v2.1 shipped: Continuous Cloud Recording (Phases 7-9) — 2026-01-21
 - Milestone v2.2 shipped: UX Polish (Phases 10-11) — 2026-01-21
+- Milestone v2.3 created: Continuous Recording UX, 3 phases (Phase 12-14)
 
 ## Session Continuity
 
 Last session: 2026-01-21
-Stopped at: v2.2 milestone complete
+Stopped at: Milestone v2.3 initialization
 Resume file: None

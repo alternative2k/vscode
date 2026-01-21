@@ -22,3 +22,29 @@ export interface StoredRecording {
  * A recording ready to be saved to IndexedDB (id will be auto-generated).
  */
 export type SavedRecording = Omit<StoredRecording, 'id'>;
+
+/**
+ * A chunk from continuous recording, stored progressively in IndexedDB.
+ */
+export interface RecordingChunk {
+  id?: number;
+  sessionId: string;
+  chunkIndex: number;
+  blob: Blob;
+  timestamp: number;
+  uploaded: boolean;
+}
+
+/**
+ * Session metadata for continuous recording.
+ */
+export interface ContinuousSession {
+  sessionId: string;
+  startTime: number;
+  endTime?: number;
+  status: 'recording' | 'uploading' | 'complete' | 'failed';
+  totalChunks: number;
+  uploadedChunks: number;
+}
+
+export type ContinuousRecordingState = 'idle' | 'recording' | 'paused' | 'uploading';

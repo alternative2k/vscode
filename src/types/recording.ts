@@ -33,6 +33,7 @@ export interface RecordingChunk {
   blob: Blob;
   timestamp: number;
   uploaded: boolean;
+  retryCount?: number; // Number of upload attempts (max 5)
 }
 
 /**

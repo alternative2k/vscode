@@ -152,6 +152,33 @@ export async function getPendingChunks(): Promise<RecordingChunk[]> {
 }
 
 /**
+ * Updates a chunk in IndexedDB.
+ */
+export async function updateChunk(chunk: RecordingChunk): Promise<void> {
+  const db = await openChunkDatabase();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(CHUNKS_STORE, 'readwrite');
+    const store = transaction.objectStore(CHUNKS_STORE);
+
+    const request = store.put(chunk);
+
+    request.onerror = () => {
+      console.error('Failed to update chunk:', request.error);
+      reject(request.error);
+    };
+
+    request.onsuccess = () => {
+      resolve();
+    };
+
+    transaction.oncomplete = () => {
+      db.close();
+    };
+  });
+}
+
+/**
  * Marks a chunk as uploaded.
  */
 export async function markChunkUploaded(id: number): Promise<void> {

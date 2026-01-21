@@ -8,6 +8,7 @@ import {
   getPendingChunks,
   markChunkUploaded,
   getChunksBySession,
+  updateChunk,
 } from '../utils/chunkStorage';
 import { uploadChunk } from '../utils/cloudUpload';
 
@@ -18,6 +19,7 @@ interface UseContinuousRecordingReturn {
   duration: number;
   chunkCount: number;
   uploadProgress: { uploaded: number; total: number };
+  hasRetries: boolean;
   enable: () => void;
   disable: () => void;
   error: string | null;
@@ -55,6 +57,7 @@ export function useContinuousRecording(
   const [duration, setDuration] = useState(0);
   const [chunkCount, setChunkCount] = useState(0);
   const [uploadProgress, setUploadProgress] = useState({ uploaded: 0, total: 0 });
+  const [hasRetries, setHasRetries] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -81,19 +84,27 @@ export function useContinuousRecording(
     }
   }, [options?.autoStart]);
 
-  // Upload pending chunks for a session
+  // Maximum retry attempts per chunk
+  const MAX_RETRIES = 5;
+
+  // Upload pending chunks for a session with retry logic
   const uploadPendingChunks = useCallback(async (forSessionId: string) => {
     if (isUploadingRef.current) return;
     isUploadingRef.current = true;
 
     try {
       const chunks = await getChunksBySession(forSessionId);
-      const pendingChunks = chunks.filter(c => !c.uploaded);
+      // Filter to pending chunks that haven't exceeded max retries
+      const pendingChunks = chunks.filter(c => !c.uploaded && (c.retryCount ?? 0) < MAX_RETRIES);
 
       if (pendingChunks.length === 0) {
         isUploadingRef.current = false;
         return;
       }
+
+      // Check if any chunks are being retried
+      const hasRetriesInBatch = pendingChunks.some(c => (c.retryCount ?? 0) > 0);
+      setHasRetries(hasRetriesInBatch);
 
       setState('uploading');
       setUploadProgress({ uploaded: 0, total: pendingChunks.length });
@@ -106,10 +117,28 @@ export function useContinuousRecording(
             await markChunkUploaded(chunk.id);
             uploadedCount++;
             setUploadProgress({ uploaded: uploadedCount, total: pendingChunks.length });
+          } else if (chunk.id !== undefined) {
+            // Upload failed - increment retry count and save back to IndexedDB
+            const newRetryCount = (chunk.retryCount ?? 0) + 1;
+            chunk.retryCount = newRetryCount;
+            await updateChunk(chunk);
+
+            if (newRetryCount >= MAX_RETRIES) {
+              console.error(`Chunk ${chunk.chunkIndex} exceeded max retries (${MAX_RETRIES}), giving up`);
+            }
           }
         } catch (err) {
           console.error('Failed to upload chunk:', err);
-          // Continue with other chunks, don't fail entirely
+          // Increment retry count on exception
+          if (chunk.id !== undefined) {
+            const newRetryCount = (chunk.retryCount ?? 0) + 1;
+            chunk.retryCount = newRetryCount;
+            await updateChunk(chunk);
+
+            if (newRetryCount >= MAX_RETRIES) {
+              console.error(`Chunk ${chunk.chunkIndex} exceeded max retries (${MAX_RETRIES}), giving up`);
+            }
+          }
         }
       }
 
@@ -120,14 +149,16 @@ export function useContinuousRecording(
         await saveSession(session);
       }
 
-      // If all chunks uploaded, mark session complete
-      if (uploadedCount === pendingChunks.length) {
+      // If all original pending chunks uploaded, mark session complete
+      const remainingPending = (await getChunksBySession(forSessionId)).filter(c => !c.uploaded && (c.retryCount ?? 0) < MAX_RETRIES);
+      if (remainingPending.length === 0) {
         await updateSessionStatus(forSessionId, 'complete');
       }
     } catch (err) {
       console.error('Error during chunk upload:', err);
     } finally {
       isUploadingRef.current = false;
+      setHasRetries(false);
       // Return to recording state if still enabled and recording
       if (mediaRecorderRef.current?.state === 'recording') {
         setState('recording');
@@ -325,6 +356,19 @@ export function useContinuousRecording(
     uploadPreviousSessionChunks();
   }, [uploadPendingChunks]);
 
+  // Network reconnection listener - retry pending uploads when online
+  useEffect(() => {
+    const handleOnline = () => {
+      // Network came back - retry any pending chunks
+      if (sessionIdRef.current) {
+        uploadPendingChunks(sessionIdRef.current);
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [uploadPendingChunks]);
+
   return {
     state,
     isEnabled,
@@ -332,6 +376,7 @@ export function useContinuousRecording(
     duration,
     chunkCount,
     uploadProgress,
+    hasRetries,
     enable,
     disable,
     error,

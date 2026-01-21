@@ -101,10 +101,10 @@ Plans:
 **Goal**: Auto-retry uploads with reconnection handling, organize by date folders (2026-01-21/session-abc/chunk-0001.webm)
 **Depends on**: Phase 12
 **Research**: Unlikely (extending existing upload logic)
-**Plans**: TBD
+**Plans**: 1/1 complete
 
 Plans:
-- [ ] 14-01: TBD
+- [x] 14-01: Resilient upload with date folders and retry logic (completed 2026-01-21)
 
 ## Progress (v2.3)
 
@@ -112,4 +112,4 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 12. Auto-Start Recording | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 13. Status Indicator | v2.3 | 1/1 | Complete | 2026-01-21 |
-| 14. Resilient Upload | v2.3 | 0/? | Not started | - |
+| 14. Resilient Upload | v2.3 | 1/1 | Complete | 2026-01-21 |

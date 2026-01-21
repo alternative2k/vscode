@@ -91,10 +91,10 @@ Plans:
 **Goal**: Replace continuous recording button with status icon (green=active, yellow=retrying, grey=inactive)
 **Depends on**: Phase 12
 **Research**: Unlikely (UI component work)
-**Plans**: TBD
+**Plans**: 1/1 complete
 
 Plans:
-- [ ] 13-01: TBD
+- [x] 13-01: Status indicator component (completed 2026-01-21)
 
 #### Phase 14: Resilient Upload
 
@@ -111,5 +111,5 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 12. Auto-Start Recording | v2.3 | 1/1 | Complete | 2026-01-21 |
-| 13. Status Indicator | v2.3 | 0/? | Not started | - |
+| 13. Status Indicator | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 14. Resilient Upload | v2.3 | 0/? | Not started | - |

@@ -88,7 +88,7 @@ export function CameraPreview() {
 
   // Skeleton overlay visibility state
   const [showSkeleton, setShowSkeleton] = useState(true);
-  const { currentAlert, isExercising } = useExerciseAlerts(landmarks, exerciseMode);
+  const { currentAlert, affectedLandmarks, isExercising } = useExerciseAlerts(landmarks, exerciseMode);
   const { state: recordingState, recording, duration, startRecording, stopRecording } = useRecording(stream);
 
   // Recording history
@@ -274,6 +274,8 @@ export function CameraPreview() {
           landmarks={landmarks}
           width={videoDimensions.width}
           height={videoDimensions.height}
+          highlightLandmarks={affectedLandmarks}
+          highlightSeverity={currentAlert?.severity}
         />
       )}
 

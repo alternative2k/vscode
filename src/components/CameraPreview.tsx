@@ -6,6 +6,7 @@ import { useRecording } from '../hooks/useRecording';
 import { useRecordingHistory } from '../hooks/useRecordingHistory';
 import { useCloudUpload } from '../hooks/useCloudUpload';
 import { useContinuousRecording } from '../hooks/useContinuousRecording';
+import { uploadToCloud } from '../utils/cloudUpload';
 import { PoseCanvas } from './PoseCanvas';
 import { AlertOverlay } from './AlertOverlay';
 import { RecordingControls } from './RecordingControls';
@@ -34,6 +35,7 @@ export function CameraPreview() {
   } = useRecordingHistory();
   const [showRecordingList, setShowRecordingList] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingManual, setIsUploadingManual] = useState(false);
 
   // Cloud upload
   const {
@@ -68,6 +70,20 @@ export function CameraPreview() {
       setIsSaving(false);
     }
   }, [recording, saveRecording]);
+
+  // Handle direct upload of manual recording to cloud
+  const handleUploadRecording = useCallback(async () => {
+    if (!recording || !cloudEnabled) return;
+    setIsUploadingManual(true);
+    try {
+      // Generate filename for the upload
+      const timestamp = recording.timestamp.getTime();
+      const fileName = `manual/formcheck-${timestamp}.webm`;
+      await uploadToCloud(recording.blob, fileName);
+    } finally {
+      setIsUploadingManual(false);
+    }
+  }, [recording, cloudEnabled]);
 
   // Open/close recording list modal
   const handleShowHistory = useCallback(() => {
@@ -343,6 +359,9 @@ export function CameraPreview() {
         onShowHistory={handleShowHistory}
         recordingCount={storageStats.count}
         isSaving={isSaving}
+        onUpload={handleUploadRecording}
+        isUploading={isUploadingManual}
+        cloudEnabled={cloudEnabled}
       />
 
       {/* Recording list modal */}

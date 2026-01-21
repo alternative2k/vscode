@@ -29,6 +29,10 @@ interface RecordingControlsProps {
   onShowHistory?: () => void;
   recordingCount?: number;
   isSaving?: boolean;
+  // Cloud upload props
+  onUpload?: () => void;
+  isUploading?: boolean;
+  cloudEnabled?: boolean;
 }
 
 export function RecordingControls({
@@ -41,6 +45,9 @@ export function RecordingControls({
   onShowHistory,
   recordingCount = 0,
   isSaving = false,
+  onUpload,
+  isUploading = false,
+  cloudEnabled = false,
 }: RecordingControlsProps) {
   // Download the recorded video
   const handleDownload = useCallback(() => {
@@ -153,6 +160,36 @@ export function RecordingControls({
                 clipRule="evenodd"
               />
             </svg>
+          </button>
+        )}
+
+        {/* Upload button - appears when recording is available and cloud is configured */}
+        {state === 'stopped' && recording && cloudEnabled && onUpload && (
+          <button
+            onClick={onUpload}
+            disabled={isUploading}
+            className="p-3 rounded-full transition-colors shadow-lg bg-violet-600/90 hover:bg-violet-500/90 active:bg-violet-400/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ minWidth: '48px', minHeight: '48px' }}
+            aria-label="Upload to cloud"
+            title="Upload to cloud"
+          >
+            {isUploading ? (
+              <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6"
+              >
+                {/* Cloud with up arrow icon */}
+                <path
+                  fillRule="evenodd"
+                  d="M10.5 3.75a6 6 0 00-5.98 6.496A5.25 5.25 0 006.75 20.25H18a4.5 4.5 0 002.206-8.423 3.75 3.75 0 00-4.133-4.303A6.001 6.001 0 0010.5 3.75zm2.03 5.47a.75.75 0 00-1.06 0l-3 3a.75.75 0 101.06 1.06l1.72-1.72v4.19a.75.75 0 001.5 0v-4.19l1.72 1.72a.75.75 0 101.06-1.06l-3-3z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
           </button>
         )}
 

@@ -10,9 +10,9 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 
 ## Current State
 
-**Shipped:** v2.2 UX Polish (2026-01-21)
+**Shipped:** v2.3 Continuous Recording UX (2026-01-21)
 
-- 5,467 lines TypeScript across 29 files
+- 5,581 lines TypeScript across 29 files
 - Tech stack: Vite, React, TypeScript, Tailwind CSS v4, MediaPipe Pose, Cloudflare Pages/R2
 - Deployable to Cloudflare Pages (or static hosting with serverless backend)
 
@@ -33,6 +33,9 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 - Fullscreen mode with orientation-aware layout for mobile workouts
 - Severity-based skeleton highlighting (problem body parts glow yellow/red)
 - Color-coded alert banners matching severity levels
+- Auto-start continuous recording on camera load
+- Status indicator showing recording/uploading/retrying states
+- Date-based cloud folder organization with resilient retry uploads
 
 ## Requirements
 
@@ -55,6 +58,10 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 - ✓ Fullscreen mode for immersive workout sessions — v2.2
 - ✓ Orientation-aware layout for landscape mode — v2.2
 - ✓ Severity-based visual feedback on skeleton overlay — v2.2
+- ✓ Auto-start continuous recording on camera load — v2.3
+- ✓ Status indicator for continuous recording state — v2.3
+- ✓ Date-based folder organization for cloud uploads — v2.3
+- ✓ Resilient upload with retry and network reconnection handling — v2.3
 
 ### Active
 
@@ -103,6 +110,12 @@ S3 upload (deferred to v2) means users would configure their own bucket credenti
 | Yellow warnings, red errors on skeleton | Clear visual severity escalation | ✓ Good |
 | Glow effect for highlighted landmarks | Visibility against any background | ✓ Good |
 | Fallback polling for video dimensions | Cross-browser reliability | ✓ Good |
+| Auto-start continuous recording | Seamless UX, no manual toggle | ✓ Good |
+| Options object for hook config | Future extensibility | ✓ Good |
+| Orange for retry state | Visual distinction from regular upload | ✓ Good |
+| Max 5 retries per chunk | Balance persistence vs infinite loops | ✓ Good |
+| Window online event for reconnection | Standard browser API | ✓ Good |
+| Date folder format (YYYY-MM-DD) | Easy organization and browsing | ✓ Good |
 | Client-side pose detection | No backend needed, free hosting, privacy | ✓ Good |
 | Web app over native | Single codebase covers laptop + mobile | ✓ Good |
 | Native IndexedDB API (no wrapper) | Simple use case, fewer dependencies | ✓ Good |
@@ -110,4 +123,4 @@ S3 upload (deferred to v2) means users would configure their own bucket credenti
 | Modal overlay with click-to-close | Intuitive UX for recording history | ✓ Good |
 
 ---
-*Last updated: 2026-01-21 after v2.2 milestone*
+*Last updated: 2026-01-21 after v2.3 milestone*

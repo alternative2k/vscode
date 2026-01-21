@@ -1,5 +1,32 @@
 # Project Milestones: FormCheck
 
+## v2.3 Continuous Recording UX (Shipped: 2026-01-21)
+
+**Delivered:** Seamless continuous recording that auto-starts on camera load with visual status indicator and resilient upload handling including date-based folder organization and automatic retry.
+
+**Phases completed:** 12-14 (3 plans total)
+
+**Key accomplishments:**
+
+- Auto-start continuous recording when camera loads (no manual toggle needed)
+- Read-only status indicator with color-coded states (green/yellow/orange/grey/red)
+- Date-based cloud folder organization (YYYY-MM-DD/sessionId/chunk.webm)
+- Exponential backoff retry for failed uploads (max 5 attempts per chunk)
+- Network reconnection detection with automatic retry of pending chunks
+
+**Stats:**
+
+- 12 files modified
+- 5,581 total lines of TypeScript
+- 3 phases, 3 plans, 7 tasks
+- Same day (2026-01-21)
+
+**Git range:** `feat(12-01)` → `feat(14-01)`
+
+**What's next:** TBD
+
+---
+
 ## v2.2 UX Polish (Shipped: 2026-01-21)
 
 **Delivered:** Mobile-optimized workout experience with fullscreen mode, orientation-aware layout, and severity-based visual feedback on skeleton overlay.

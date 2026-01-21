@@ -23,6 +23,7 @@ export type ExerciseAlert = PostureAlert | SquatFormAlert | PushupFormAlert;
 
 interface UseExerciseAlertsReturn {
   currentAlert: ExerciseAlert | null;
+  affectedLandmarks: number[]; // Convenience accessor for highlighting
   playAlertSound: () => void;
   isExercising: boolean;
 }
@@ -205,8 +206,12 @@ export function useExerciseAlerts(
     };
   }, []);
 
+  // Extract affectedLandmarks from currentAlert for convenience
+  const affectedLandmarks = currentAlert?.affectedLandmarks ?? [];
+
   return {
     currentAlert,
+    affectedLandmarks,
     playAlertSound,
     isExercising,
   };

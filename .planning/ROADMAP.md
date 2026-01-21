@@ -10,6 +10,7 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 - ✅ **v1.1 Recording History** - [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) (Phase 5, shipped 2026-01-16)
 - ✅ **v2.0 Cloud Backup** - [milestones/v2.0-ROADMAP.md](milestones/v2.0-ROADMAP.md) (Phase 6, shipped 2026-01-16) ⚠️ Known limitation: requires backend for secure uploads
 - ✅ **v2.1 Continuous Cloud Recording** - [milestones/v2.1-ROADMAP.md](milestones/v2.1-ROADMAP.md) (Phases 7-9, shipped 2026-01-21)
+- 🚧 **v2.2 UX Polish** - Phases 10-11 (in progress)
 
 ## Completed Milestones
 
@@ -46,6 +47,30 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 
 </details>
 
+### 🚧 v2.2 UX Polish (In Progress)
+
+**Milestone Goal:** Improve mobile workout experience and make form feedback more visible and informative during active exercise.
+
+#### Phase 10: Mobile UX
+
+**Goal**: Add fullscreen mode and better orientation handling for mobile workouts
+**Depends on**: Phase 9
+**Research**: Unlikely (standard web APIs)
+**Plans**: TBD
+
+Plans:
+- [ ] 10-01: TBD (run /gsd:plan-phase 10 to break down)
+
+#### Phase 11: Alert System Overhaul
+
+**Goal**: Make alerts more prominent with position feedback on skeleton and severity color-coding
+**Depends on**: Phase 10
+**Research**: Unlikely (internal UI patterns)
+**Plans**: TBD
+
+Plans:
+- [ ] 11-01: TBD (run /gsd:plan-phase 11 to break down)
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -59,3 +84,5 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 | 7. Storage Migration | v2.1 | 3/3 | Complete | 2026-01-20 |
 | 8. Continuous Recording | v2.1 | 3/3 | Complete | 2026-01-21 |
 | 9. Dual Recording Mode | v2.1 | 1/1 | Complete | 2026-01-21 |
+| 10. Mobile UX | v2.2 | 0/? | Not started | - |
+| 11. Alert System Overhaul | v2.2 | 0/? | Not started | - |

@@ -35,6 +35,7 @@ export interface PushupFormAlert {
   type: 'pushup-depth' | 'pushup-hip-sag' | 'pushup-hip-pike' | 'pushup-elbow-flare';
   message: string;
   severity: 'warning' | 'error';
+  affectedLandmarks: number[];
 }
 
 /**
@@ -224,6 +225,7 @@ export function checkPushupForm(landmarks: Landmark[]): PushupFormAlert | null {
         type: 'pushup-hip-sag',
         message: 'Hips sagging - tighten core',
         severity: 'warning',
+        affectedLandmarks: [LEFT_HIP, RIGHT_HIP, LEFT_SHOULDER, RIGHT_SHOULDER],
       };
     }
 
@@ -233,6 +235,7 @@ export function checkPushupForm(landmarks: Landmark[]): PushupFormAlert | null {
         type: 'pushup-hip-pike',
         message: 'Hips too high - lower to straight line',
         severity: 'warning',
+        affectedLandmarks: [LEFT_HIP, RIGHT_HIP, LEFT_SHOULDER, RIGHT_SHOULDER],
       };
     }
   }
@@ -246,6 +249,7 @@ export function checkPushupForm(landmarks: Landmark[]): PushupFormAlert | null {
         type: 'pushup-depth',
         message: 'Go deeper - lower chest',
         severity: 'warning',
+        affectedLandmarks: [LEFT_ELBOW, RIGHT_ELBOW, LEFT_SHOULDER, RIGHT_SHOULDER],
       };
     }
   }
@@ -285,6 +289,7 @@ export function checkPushupForm(landmarks: Landmark[]): PushupFormAlert | null {
           type: 'pushup-elbow-flare',
           message: 'Elbows flaring - tuck them in',
           severity: 'warning',
+          affectedLandmarks: [LEFT_ELBOW, LEFT_SHOULDER, LEFT_WRIST],
         };
       }
     }
@@ -302,6 +307,7 @@ export function checkPushupForm(landmarks: Landmark[]): PushupFormAlert | null {
           type: 'pushup-elbow-flare',
           message: 'Elbows flaring - tuck them in',
           severity: 'warning',
+          affectedLandmarks: [RIGHT_ELBOW, RIGHT_SHOULDER, RIGHT_WRIST],
         };
       }
     }

@@ -27,6 +27,7 @@ export interface SquatFormAlert {
   type: 'squat-depth' | 'squat-knee-cave' | 'squat-forward-lean' | 'squat-asymmetric';
   message: string;
   severity: 'warning' | 'error';
+  affectedLandmarks: number[];
 }
 
 /**
@@ -164,6 +165,7 @@ export function checkSquatForm(landmarks: Landmark[]): SquatFormAlert | null {
         type: 'squat-asymmetric',
         message: 'Uneven squat - balance your weight',
         severity: 'warning',
+        affectedLandmarks: [LEFT_HIP, LEFT_KNEE, LEFT_ANKLE, RIGHT_HIP, RIGHT_KNEE, RIGHT_ANKLE],
       };
     }
   }
@@ -178,6 +180,7 @@ export function checkSquatForm(landmarks: Landmark[]): SquatFormAlert | null {
       type: 'squat-depth',
       message: 'Go deeper - break parallel',
       severity: 'warning',
+      affectedLandmarks: [LEFT_HIP, LEFT_KNEE, RIGHT_HIP, RIGHT_KNEE],
     };
   }
 
@@ -193,6 +196,7 @@ export function checkSquatForm(landmarks: Landmark[]): SquatFormAlert | null {
         type: 'squat-knee-cave',
         message: 'Knees caving in - push knees out',
         severity: 'error',
+        affectedLandmarks: [LEFT_KNEE, RIGHT_KNEE, LEFT_ANKLE, RIGHT_ANKLE],
       };
     }
   }
@@ -205,6 +209,7 @@ export function checkSquatForm(landmarks: Landmark[]): SquatFormAlert | null {
         type: 'squat-forward-lean',
         message: 'Leaning too far forward - chest up',
         severity: 'warning',
+        affectedLandmarks: [LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_HIP, RIGHT_HIP],
       };
     }
   }

@@ -24,6 +24,7 @@ export interface PostureAlert {
   type: string;
   message: string;
   severity: 'warning' | 'error';
+  affectedLandmarks: number[]; // Landmark indices to highlight
 }
 
 /**
@@ -79,6 +80,7 @@ export function checkGeneralPosture(landmarks: Landmark[]): PostureAlert | null 
       type: 'visibility',
       message: 'Step back - full body not visible',
       severity: 'warning',
+      affectedLandmarks: [], // No specific landmarks (body not visible)
     };
   }
 
@@ -89,6 +91,7 @@ export function checkGeneralPosture(landmarks: Landmark[]): PostureAlert | null 
       type: 'uneven',
       message: 'Shoulders uneven - stand straight',
       severity: 'warning',
+      affectedLandmarks: [LEFT_SHOULDER, RIGHT_SHOULDER],
     };
   }
 
@@ -101,6 +104,7 @@ export function checkGeneralPosture(landmarks: Landmark[]): PostureAlert | null 
       type: 'twisted',
       message: 'Body twisted - face the camera',
       severity: 'warning',
+      affectedLandmarks: [LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_HIP, RIGHT_HIP],
     };
   }
 
@@ -113,6 +117,7 @@ export function checkGeneralPosture(landmarks: Landmark[]): PostureAlert | null 
         type: 'leaning',
         message: 'Leaning too far - center yourself',
         severity: 'warning',
+        affectedLandmarks: [NOSE, LEFT_SHOULDER, RIGHT_SHOULDER],
       };
     }
   }

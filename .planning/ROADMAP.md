@@ -66,10 +66,11 @@ Plans:
 **Goal**: Make alerts more prominent with position feedback on skeleton and severity color-coding
 **Depends on**: Phase 10
 **Research**: Unlikely (internal UI patterns)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 11-01: TBD (run /gsd:plan-phase 11 to break down)
+- [ ] 11-01: Add affectedLandmarks to alert types
+- [ ] 11-02: Severity-based skeleton highlighting and alert colors
 
 ## Progress
 
@@ -84,5 +85,5 @@ Plans:
 | 7. Storage Migration | v2.1 | 3/3 | Complete | 2026-01-20 |
 | 8. Continuous Recording | v2.1 | 3/3 | Complete | 2026-01-21 |
 | 9. Dual Recording Mode | v2.1 | 1/1 | Complete | 2026-01-21 |
-| 10. Mobile UX | v2.2 | 0/1 | Not started | - |
-| 11. Alert System Overhaul | v2.2 | 0/? | Not started | - |
+| 10. Mobile UX | v2.2 | 1/1 | Complete | 2026-01-21 |
+| 11. Alert System Overhaul | v2.2 | 0/2 | Not started | - |

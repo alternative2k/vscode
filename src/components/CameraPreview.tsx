@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useCamera } from '../hooks/useCamera';
 import { usePoseDetection } from '../hooks/usePoseDetection';
 import { useExerciseAlerts, ExerciseMode } from '../hooks/useExerciseAlerts';
@@ -14,10 +14,74 @@ import { RecordingControls } from './RecordingControls';
 import { RecordingList } from './RecordingList';
 import { CloudConfigModal } from './CloudConfigModal';
 
+// Detect if running on a mobile device
+function isMobileDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Get current orientation type
+function getOrientation(): 'portrait' | 'landscape' {
+  if (typeof window === 'undefined') return 'portrait';
+  // Use screen.orientation.type if available (most modern browsers)
+  if (window.screen?.orientation?.type) {
+    return window.screen.orientation.type.includes('portrait') ? 'portrait' : 'landscape';
+  }
+  // Fallback to window dimensions
+  return window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
+}
+
 export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
   const { landmarks, isDetecting } = usePoseDetection(videoRef, facingMode);
   const { isFullscreen, toggleFullscreen, isSupported: fullscreenSupported } = useFullscreen();
+
+  // Orientation tracking
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(getOrientation);
+  const [showRotationHint, setShowRotationHint] = useState(false);
+  const hasShownRotationHintRef = useRef(false);
+  const isMobile = useRef(isMobileDevice()).current;
+
+  // Track orientation changes
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      setOrientation(getOrientation());
+    };
+
+    // Use screen.orientation API if available
+    if (window.screen?.orientation) {
+      window.screen.orientation.addEventListener('change', handleOrientationChange);
+    }
+    // Fallback to resize event
+    window.addEventListener('resize', handleOrientationChange);
+    // Legacy orientationchange event
+    window.addEventListener('orientationchange', handleOrientationChange);
+
+    return () => {
+      if (window.screen?.orientation) {
+        window.screen.orientation.removeEventListener('change', handleOrientationChange);
+      }
+      window.removeEventListener('resize', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, []);
+
+  // Show rotation hint when entering fullscreen in portrait on mobile
+  useEffect(() => {
+    if (isFullscreen && orientation === 'portrait' && isMobile && !hasShownRotationHintRef.current) {
+      hasShownRotationHintRef.current = true;
+      setShowRotationHint(true);
+      // Auto-dismiss after 3 seconds
+      const timer = setTimeout(() => {
+        setShowRotationHint(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+    // Reset hint flag when exiting fullscreen
+    if (!isFullscreen) {
+      hasShownRotationHintRef.current = false;
+    }
+  }, [isFullscreen, orientation, isMobile]);
 
   // Exercise mode state
   const [exerciseMode, setExerciseMode] = useState<ExerciseMode>('general');
@@ -216,8 +280,33 @@ export function CameraPreview() {
       {/* Alert overlay for bad posture */}
       <AlertOverlay alert={currentAlert} />
 
+      {/* Rotation hint toast - shows when entering fullscreen in portrait on mobile */}
+      {showRotationHint && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 animate-fade-in">
+          <div className="bg-gray-900/90 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-6 h-6 text-blue-400"
+            >
+              <path d="M17 2H7a2 2 0 00-2 2v16a2 2 0 002 2h10a2 2 0 002-2V4a2 2 0 00-2-2z" />
+              <path d="M12 18h.01" />
+            </svg>
+            <span className="text-sm font-medium">Rotate device for best view</span>
+          </div>
+        </div>
+      )}
+
       {/* Detection status indicator and skeleton toggle */}
-      <div className="absolute top-4 left-4 flex flex-col gap-2">
+      {/* In fullscreen landscape: show minimal indicator only, hide toggle buttons to maximize video */}
+      <div className={`absolute top-4 left-4 flex flex-col gap-2 transition-opacity ${
+        isFullscreen && orientation === 'landscape' ? 'opacity-60 hover:opacity-100' : ''
+      }`}>
         <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
           isDetecting && landmarks
             ? 'bg-green-500/80 text-white'
@@ -314,7 +403,10 @@ export function CameraPreview() {
       </div>
 
       {/* Exercise mode selector */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
+      {/* In fullscreen landscape: reduce opacity to minimize distraction, show on hover */}
+      <div className={`absolute top-4 right-4 flex flex-col gap-2 items-end transition-opacity ${
+        isFullscreen && orientation === 'landscape' ? 'opacity-60 hover:opacity-100' : ''
+      }`}>
         <div className="flex gap-1 bg-gray-800/80 rounded-full p-1">
           <button
             onClick={() => setExerciseMode('general')}

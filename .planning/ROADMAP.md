@@ -69,7 +69,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 11-01: Add affectedLandmarks to alert types
+- [x] 11-01: Add affectedLandmarks to alert types
 - [ ] 11-02: Severity-based skeleton highlighting and alert colors
 
 ## Progress
@@ -86,4 +86,4 @@ Plans:
 | 8. Continuous Recording | v2.1 | 3/3 | Complete | 2026-01-21 |
 | 9. Dual Recording Mode | v2.1 | 1/1 | Complete | 2026-01-21 |
 | 10. Mobile UX | v2.2 | 1/1 | Complete | 2026-01-21 |
-| 11. Alert System Overhaul | v2.2 | 0/2 | Not started | - |
+| 11. Alert System Overhaul | v2.2 | 1/2 | In progress | - |

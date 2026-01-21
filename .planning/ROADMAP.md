@@ -81,10 +81,10 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 **Goal**: Auto-start continuous recording when camera preview loads, stop on close/refresh
 **Depends on**: Phase 8 (Continuous Recording infrastructure)
 **Research**: Unlikely (building on existing continuous recording)
-**Plans**: TBD
+**Plans**: 1/1 complete
 
 Plans:
-- [ ] 12-01: TBD (run /gsd:plan-phase 12 to break down)
+- [x] 12-01: Auto-start continuous recording (completed 2026-01-21)
 
 #### Phase 13: Status Indicator
 
@@ -110,6 +110,6 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 12. Auto-Start Recording | v2.3 | 0/? | Not started | - |
+| 12. Auto-Start Recording | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 13. Status Indicator | v2.3 | 0/? | Not started | - |
 | 14. Resilient Upload | v2.3 | 0/? | Not started | - |

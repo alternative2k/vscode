@@ -56,10 +56,10 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 **Goal**: Add fullscreen mode and better orientation handling for mobile workouts
 **Depends on**: Phase 9
 **Research**: Unlikely (standard web APIs)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 10-01: TBD (run /gsd:plan-phase 10 to break down)
+- [ ] 10-01: Fullscreen mode and orientation handling
 
 #### Phase 11: Alert System Overhaul
 
@@ -84,5 +84,5 @@ Plans:
 | 7. Storage Migration | v2.1 | 3/3 | Complete | 2026-01-20 |
 | 8. Continuous Recording | v2.1 | 3/3 | Complete | 2026-01-21 |
 | 9. Dual Recording Mode | v2.1 | 1/1 | Complete | 2026-01-21 |
-| 10. Mobile UX | v2.2 | 0/? | Not started | - |
+| 10. Mobile UX | v2.2 | 0/1 | Not started | - |
 | 11. Alert System Overhaul | v2.2 | 0/? | Not started | - |

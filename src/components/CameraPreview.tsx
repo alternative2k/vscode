@@ -120,6 +120,7 @@ export function CameraPreview() {
     state: continuousState,
     error: continuousError,
     uploadProgress,
+    hasRetries: continuousHasRetries,
   } = useContinuousRecording(stream, { autoStart: true });
 
   // Handle save recording to IndexedDB
@@ -373,6 +374,7 @@ export function CameraPreview() {
           state={continuousState}
           error={continuousError}
           uploadProgress={uploadProgress}
+          hasRetries={continuousHasRetries}
         />
       </div>
 

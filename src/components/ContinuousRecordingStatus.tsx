@@ -2,12 +2,14 @@ interface ContinuousRecordingStatusProps {
   state: 'idle' | 'recording' | 'paused' | 'uploading';
   error: string | null;
   uploadProgress?: { uploaded: number; total: number };
+  hasRetries?: boolean;
 }
 
 export function ContinuousRecordingStatus({
   state,
   error,
   uploadProgress,
+  hasRetries,
 }: ContinuousRecordingStatusProps) {
   // Error state takes precedence
   if (error) {
@@ -30,13 +32,16 @@ export function ContinuousRecordingStatus({
     );
   }
 
-  // Uploading state - yellow, pulsing with progress
+  // Uploading state - yellow/orange, pulsing with progress
   if (state === 'uploading') {
+    const action = hasRetries ? 'Retrying' : 'Uploading';
     const progressText = uploadProgress
-      ? `Uploading ${uploadProgress.uploaded}/${uploadProgress.total}`
-      : 'Uploading';
+      ? `${action} ${uploadProgress.uploaded}/${uploadProgress.total}`
+      : action;
+    // Use orange for retries, yellow for regular uploads
+    const bgColor = hasRetries ? 'bg-orange-500/80' : 'bg-yellow-500/80';
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-yellow-500/80 text-white">
+      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${bgColor} text-white`}>
         <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
         {progressText}
       </div>

@@ -23,6 +23,10 @@ interface UseContinuousRecordingReturn {
   error: string | null;
 }
 
+interface UseContinuousRecordingOptions {
+  autoStart?: boolean;
+}
+
 // Get supported MIME type (same pattern as useRecording)
 function getSupportedMimeType(): string {
   const types = [
@@ -42,7 +46,8 @@ function getSupportedMimeType(): string {
 }
 
 export function useContinuousRecording(
-  stream: MediaStream | null
+  stream: MediaStream | null,
+  options?: UseContinuousRecordingOptions
 ): UseContinuousRecordingReturn {
   const [state, setState] = useState<ContinuousRecordingState>('idle');
   const [isEnabled, setIsEnabled] = useState(false);
@@ -68,6 +73,13 @@ export function useContinuousRecording(
   useEffect(() => {
     sessionIdRef.current = sessionId;
   }, [sessionId]);
+
+  // Auto-enable recording when autoStart is true
+  useEffect(() => {
+    if (options?.autoStart) {
+      setIsEnabled(true);
+    }
+  }, [options?.autoStart]);
 
   // Upload pending chunks for a session
   const uploadPendingChunks = useCallback(async (forSessionId: string) => {

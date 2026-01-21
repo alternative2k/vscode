@@ -114,17 +114,9 @@ export function CameraPreview() {
   } = useCloudUpload();
   const [showCloudConfig, setShowCloudConfig] = useState(false);
 
-  // Continuous recording
-  const {
-    state: continuousState,
-    isEnabled: continuousEnabled,
-    duration: continuousDuration,
-    chunkCount,
-    uploadProgress,
-    enable: enableContinuous,
-    disable: disableContinuous,
-    error: continuousError,
-  } = useContinuousRecording(stream);
+  // Continuous recording - auto-starts when stream is available
+  // Status UI will be re-added in Phase 13 as a read-only indicator
+  useContinuousRecording(stream, { autoStart: true });
 
   // Handle save recording to IndexedDB
   const handleSaveRecording = useCallback(async () => {
@@ -371,59 +363,6 @@ export function CameraPreview() {
           </svg>
           {showSkeleton ? 'Skeleton On' : 'Skeleton Off'}
         </button>
-
-        {/* Continuous recording toggle */}
-        <button
-          onClick={continuousEnabled ? disableContinuous : enableContinuous}
-          disabled={continuousState === 'uploading'}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-            continuousState === 'uploading'
-              ? 'bg-yellow-500/80 text-white cursor-wait'
-              : continuousState === 'recording'
-              ? 'bg-blue-500/80 text-white hover:bg-blue-600/80'
-              : 'bg-gray-800/80 text-gray-300 hover:bg-gray-700/80'
-          }`}
-          title={
-            continuousState === 'uploading'
-              ? 'Uploading chunks...'
-              : continuousEnabled
-              ? 'Stop continuous recording'
-              : 'Start continuous background recording'
-          }
-        >
-          {/* Status indicator */}
-          {continuousState === 'recording' && (
-            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-          )}
-          {continuousState === 'uploading' && (
-            <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          )}
-          {continuousState === 'idle' && !continuousEnabled && (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-3 h-3"
-            >
-              <path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm16 12H4V6h16v10z" />
-              <circle cx="12" cy="11" r="3" />
-            </svg>
-          )}
-
-          {/* Button text */}
-          {continuousState === 'uploading'
-            ? `${uploadProgress.uploaded}/${uploadProgress.total}`
-            : continuousState === 'recording'
-            ? `${Math.floor(continuousDuration / 60).toString().padStart(2, '0')}:${(continuousDuration % 60).toString().padStart(2, '0')} (${chunkCount})`
-            : 'Continuous'}
-        </button>
-
-        {/* Continuous recording error */}
-        {continuousError && (
-          <div className="px-3 py-1 bg-red-600/80 rounded-full text-xs text-white">
-            {continuousError}
-          </div>
-        )}
       </div>
 
       {/* Exercise mode selector */}

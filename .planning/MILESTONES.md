@@ -1,5 +1,33 @@
 # Project Milestones: FormCheck
 
+## v2.2 UX Polish (Shipped: 2026-01-21)
+
+**Delivered:** Mobile-optimized workout experience with fullscreen mode, orientation-aware layout, and severity-based visual feedback on skeleton overlay.
+
+**Phases completed:** 10-11 (3 plans total)
+
+**Key accomplishments:**
+
+- Fullscreen mode with cross-browser Fullscreen API hook and graceful degradation
+- Orientation-aware CSS layout for landscape workout sessions
+- Alert interfaces extended with affectedLandmarks for body part targeting
+- Severity-based skeleton highlighting (yellow warnings, red errors with glow effects)
+- Color-coded alert banners with dynamic styling by severity
+- Video dimension fallback polling for cross-browser compatibility
+
+**Stats:**
+
+- 17 files modified
+- 5,467 total lines of TypeScript
+- 2 phases, 3 plans, ~9 tasks
+- 11 days (2026-01-10 → 2026-01-21)
+
+**Git range:** `feat(10-01)` → `docs(11)`
+
+**What's next:** TBD
+
+---
+
 ## v2.1 Continuous Cloud Recording (Shipped: 2026-01-21)
 
 **Delivered:** Continuous background recording with secure cloud uploads — video chunks saved progressively and uploaded automatically when leaving page. Manual recording works independently with direct upload option.

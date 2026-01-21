@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A web app that uses your device camera to provide real-time exercise form feedback. Shows a skeleton overlay with posture alerts for squats, push-ups, and general positioning. Works on laptops and mobile browsers, with recordings saved locally.
+A web app that uses your device camera to provide real-time exercise form feedback. Shows a skeleton overlay with severity-based visual highlighting and posture alerts for squats, push-ups, and general positioning. Works on laptops and mobile browsers with fullscreen support, orientation-aware layout, and recordings saved locally or to the cloud.
 
 ## Core Value
 
@@ -10,9 +10,9 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 
 ## Current State
 
-**Shipped:** v2.1 Continuous Cloud Recording (2026-01-21)
+**Shipped:** v2.2 UX Polish (2026-01-21)
 
-- 5,104 lines TypeScript across 27 files
+- 5,467 lines TypeScript across 29 files
 - Tech stack: Vite, React, TypeScript, Tailwind CSS v4, MediaPipe Pose, Cloudflare Pages/R2
 - Deployable to Cloudflare Pages (or static hosting with serverless backend)
 
@@ -30,6 +30,9 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 - Continuous background recording with progressive chunk saving
 - Automatic upload on page exit (visibilitychange handling)
 - Manual recording works independently with direct upload option
+- Fullscreen mode with orientation-aware layout for mobile workouts
+- Severity-based skeleton highlighting (problem body parts glow yellow/red)
+- Color-coded alert banners matching severity levels
 
 ## Requirements
 
@@ -49,6 +52,9 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 - ✓ Secure cloud uploads (presigned URLs, no client credentials) — v2.1
 - ✓ Continuous background recording with auto-upload — v2.1
 - ✓ Manual recording independent of continuous mode — v2.1
+- ✓ Fullscreen mode for immersive workout sessions — v2.2
+- ✓ Orientation-aware layout for landscape mode — v2.2
+- ✓ Severity-based visual feedback on skeleton overlay — v2.2
 
 ### Active
 
@@ -92,6 +98,11 @@ S3 upload (deferred to v2) means users would configure their own bucket credenti
 | visibilitychange for page exit | More reliable than beforeunload | ✓ Good |
 | Separate IndexedDB for chunks | Isolates continuous recording from manual recordings | ✓ Good |
 | Live overlay only, clean recordings | Simpler implementation, more flexible output | ✓ Good |
+| CSS media queries for orientation | More performant than JS state tracking | ✓ Good |
+| Hide unsupported fullscreen button | Better UX than disabled state or error | ✓ Good |
+| Yellow warnings, red errors on skeleton | Clear visual severity escalation | ✓ Good |
+| Glow effect for highlighted landmarks | Visibility against any background | ✓ Good |
+| Fallback polling for video dimensions | Cross-browser reliability | ✓ Good |
 | Client-side pose detection | No backend needed, free hosting, privacy | ✓ Good |
 | Web app over native | Single codebase covers laptop + mobile | ✓ Good |
 | Native IndexedDB API (no wrapper) | Simple use case, fewer dependencies | ✓ Good |
@@ -99,4 +110,4 @@ S3 upload (deferred to v2) means users would configure their own bucket credenti
 | Modal overlay with click-to-close | Intuitive UX for recording history | ✓ Good |
 
 ---
-*Last updated: 2026-01-21 after v2.1 milestone*
+*Last updated: 2026-01-21 after v2.2 milestone*

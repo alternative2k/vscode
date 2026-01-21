@@ -13,6 +13,7 @@ import { AlertOverlay } from './AlertOverlay';
 import { RecordingControls } from './RecordingControls';
 import { RecordingList } from './RecordingList';
 import { CloudConfigModal } from './CloudConfigModal';
+import { ContinuousRecordingStatus } from './ContinuousRecordingStatus';
 
 // Detect if running on a mobile device
 function isMobileDevice(): boolean {
@@ -115,8 +116,11 @@ export function CameraPreview() {
   const [showCloudConfig, setShowCloudConfig] = useState(false);
 
   // Continuous recording - auto-starts when stream is available
-  // Status UI will be re-added in Phase 13 as a read-only indicator
-  useContinuousRecording(stream, { autoStart: true });
+  const {
+    state: continuousState,
+    error: continuousError,
+    uploadProgress,
+  } = useContinuousRecording(stream, { autoStart: true });
 
   // Handle save recording to IndexedDB
   const handleSaveRecording = useCallback(async () => {
@@ -363,6 +367,13 @@ export function CameraPreview() {
           </svg>
           {showSkeleton ? 'Skeleton On' : 'Skeleton Off'}
         </button>
+
+        {/* Continuous recording status indicator */}
+        <ContinuousRecordingStatus
+          state={continuousState}
+          error={continuousError}
+          uploadProgress={uploadProgress}
+        />
       </div>
 
       {/* Exercise mode selector */}

@@ -46,7 +46,7 @@ Plans:
 **Plans:** 1
 
 Plans:
-- [ ] 17-01: Add userId prefix to cloud upload paths
+- [x] 17-01: Add userId prefix to cloud upload paths — completed 2026-01-22
 
 ## Completed Milestones
 
@@ -120,4 +120,4 @@ Plans:
 | 14. Resilient Upload | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 15. Multi-User Auth | v3.0 | 1/1 | Complete | 2026-01-22 |
 | 16. Admin App Lock | v3.0 | 1/1 | Complete | 2026-01-22 |
-| 17. User Cloud Folders | v3.0 | 0/1 | Planned | - |
+| 17. User Cloud Folders | v3.0 | 1/1 | Complete | 2026-01-22 |

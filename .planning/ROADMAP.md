@@ -43,10 +43,10 @@ Plans:
 **Goal:** Add userId prefix to all cloud upload paths for per-user organization in R2
 **Depends on:** Phase 16
 **Research:** Unlikely (path string modification)
-**Plans:** TBD
+**Plans:** 1
 
 Plans:
-- [ ] 17-01: TBD (run /gsd:plan-phase 17 to break down)
+- [ ] 17-01: Add userId prefix to cloud upload paths
 
 ## Completed Milestones
 
@@ -120,4 +120,4 @@ Plans:
 | 14. Resilient Upload | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 15. Multi-User Auth | v3.0 | 1/1 | Complete | 2026-01-22 |
 | 16. Admin App Lock | v3.0 | 1/1 | Complete | 2026-01-22 |
-| 17. User Cloud Folders | v3.0 | 0/? | Not started | - |
+| 17. User Cloud Folders | v3.0 | 0/1 | Planned | - |

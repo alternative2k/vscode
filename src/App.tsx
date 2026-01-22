@@ -3,7 +3,7 @@ import { PasswordGate } from './components/PasswordGate';
 import { useAuth } from './hooks/useAuth';
 
 function App() {
-  const { isAuthed, login, logout } = useAuth();
+  const { isAuthed, user, login, logout } = useAuth();
 
   // Show password gate if not authenticated
   if (!isAuthed) {
@@ -20,14 +20,22 @@ function App() {
           Real-time exercise form feedback
         </p>
 
-        {/* Logout button - small, unobtrusive */}
-        <button
-          onClick={logout}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-300 text-xs md:text-sm transition-colors"
-          aria-label="Logout"
-        >
-          Logout
-        </button>
+        {/* User info and logout - small, unobtrusive */}
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          <span className="text-gray-400 text-xs">
+            {user?.name}
+            {user?.isAdmin && (
+              <span className="text-blue-400 ml-1">(Admin)</span>
+            )}
+          </span>
+          <button
+            onClick={logout}
+            className="text-gray-500 hover:text-gray-300 text-xs md:text-sm transition-colors"
+            aria-label="Logout"
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
       {/* Main camera preview area - fills most of viewport on mobile */}

@@ -56,6 +56,7 @@ function getDateFolder(): string {
  * @param blob - The chunk blob to upload
  * @param sessionId - The continuous recording session ID
  * @param chunkIndex - The index of this chunk in the session
+ * @param userId - Optional user ID for per-user folder organization
  * @param onProgress - Optional callback for progress updates
  * @returns Promise resolving to upload result
  */
@@ -63,10 +64,12 @@ export async function uploadChunk(
   blob: Blob,
   sessionId: string,
   chunkIndex: number,
+  userId?: string,
   onProgress?: (progress: UploadProgress) => void
 ): Promise<UploadResult> {
   const dateFolder = getDateFolder();
-  const fileName = `${dateFolder}/${sessionId}/chunk-${String(chunkIndex).padStart(4, '0')}.webm`;
+  const userPrefix = userId ? `${userId}/` : '';
+  const fileName = `${userPrefix}${dateFolder}/${sessionId}/chunk-${String(chunkIndex).padStart(4, '0')}.webm`;
   return uploadToCloud(blob, fileName, onProgress);
 }
 

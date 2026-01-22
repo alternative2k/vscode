@@ -12,41 +12,11 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 - ✅ **v2.1 Continuous Cloud Recording** - [milestones/v2.1-ROADMAP.md](milestones/v2.1-ROADMAP.md) (Phases 7-9, shipped 2026-01-21)
 - ✅ **v2.2 UX Polish** - [milestones/v2.2-ROADMAP.md](milestones/v2.2-ROADMAP.md) (Phases 10-11, shipped 2026-01-21)
 - ✅ **v2.3 Continuous Recording UX** - [milestones/v2.3-ROADMAP.md](milestones/v2.3-ROADMAP.md) (Phases 12-14, shipped 2026-01-21)
-- 🚧 **v3.0 User Access Control** - Phases 15-17 (in progress)
+- ✅ **v3.0 User Access Control** - [milestones/v3.0-ROADMAP.md](milestones/v3.0-ROADMAP.md) (Phases 15-17, shipped 2026-01-22)
 
-## Current Milestone: v3.0 User Access Control
+## Current Milestone: None
 
-**Milestone Goal:** Multi-user authentication with admin-controlled app lock and per-user cloud storage folders.
-
-### Phase 15: Multi-User Auth
-
-**Goal:** Replace single shared password with multi-user system supporting user identity (id, name, password, isAdmin role)
-**Depends on:** Previous milestone complete
-**Research:** Complete ([15-RESEARCH.md](phases/15-user-access-control/15-RESEARCH.md))
-**Plans:** TBD
-
-Plans:
-- [x] 15-01: Multi-user auth system — completed 2026-01-22
-
-### Phase 16: Admin App Lock
-
-**Goal:** Add Cloudflare KV-based global lock that admin can toggle to block all non-admin users
-**Depends on:** Phase 15
-**Research:** Unlikely (simple API + KV integration)
-**Plans:** 1
-
-Plans:
-- [x] 16-01: Admin app lock with KV storage — completed 2026-01-22
-
-### Phase 17: User Cloud Folders
-
-**Goal:** Add userId prefix to all cloud upload paths for per-user organization in R2
-**Depends on:** Phase 16
-**Research:** Unlikely (path string modification)
-**Plans:** 1
-
-Plans:
-- [x] 17-01: Add userId prefix to cloud upload paths — completed 2026-01-22
+All planned milestones complete. Use `/gsd:discuss-milestone` to plan the next milestone.
 
 ## Completed Milestones
 
@@ -97,6 +67,15 @@ Plans:
 - [x] Phase 12: Auto-Start Recording (1/1 plan) — completed 2026-01-21
 - [x] Phase 13: Status Indicator (1/1 plan) — completed 2026-01-21
 - [x] Phase 14: Resilient Upload (1/1 plan) — completed 2026-01-21
+
+</details>
+
+<details>
+<summary>v3.0 User Access Control (Phases 15-17) — SHIPPED 2026-01-22</summary>
+
+- [x] Phase 15: Multi-User Auth (1/1 plan) — completed 2026-01-22
+- [x] Phase 16: Admin App Lock (1/1 plan) — completed 2026-01-22
+- [x] Phase 17: User Cloud Folders (1/1 plan) — completed 2026-01-22
 
 </details>
 

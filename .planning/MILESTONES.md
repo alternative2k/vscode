@@ -1,5 +1,32 @@
 # Project Milestones: FormCheck
 
+## v3.0 User Access Control (Shipped: 2026-01-22)
+
+**Delivered:** Multi-user authentication with admin-controlled app lock and per-user cloud storage folders for organized R2 uploads.
+
+**Phases completed:** 15-17 (3 plans total)
+
+**Key accomplishments:**
+
+- Multi-user auth system with User type (id, name, password, isAdmin)
+- Backward-compatible single-user auth via VITE_APP_PASSWORD fallback
+- Admin-controlled app lock using Cloudflare KV for global state
+- Locked screen blocking non-admin users when app is locked
+- Per-user cloud folder organization in R2 (userId prefix in upload paths)
+
+**Stats:**
+
+- 19 files modified
+- 5,940 total lines of TypeScript
+- 3 phases, 3 plans, 9 tasks
+- Same day (2026-01-22)
+
+**Git range:** `feat(15-01)` → `feat(17-01)`
+
+**What's next:** TBD
+
+---
+
 ## v2.3 Continuous Recording UX (Shipped: 2026-01-21)
 
 **Delivered:** Seamless continuous recording that auto-starts on camera load with visual status indicator and resilient upload handling including date-based folder organization and automatic retry.

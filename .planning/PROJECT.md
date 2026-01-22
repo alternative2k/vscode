@@ -10,11 +10,11 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 
 ## Current State
 
-**Shipped:** v2.3 Continuous Recording UX (2026-01-21)
+**Shipped:** v3.0 User Access Control (2026-01-22)
 
-- 5,581 lines TypeScript across 29 files
-- Tech stack: Vite, React, TypeScript, Tailwind CSS v4, MediaPipe Pose, Cloudflare Pages/R2
-- Deployable to Cloudflare Pages (or static hosting with serverless backend)
+- 5,940 lines TypeScript across 32 files
+- Tech stack: Vite, React, TypeScript, Tailwind CSS v4, MediaPipe Pose, Cloudflare Pages/R2/KV
+- Deployable to Cloudflare Pages (requires KV namespace binding)
 
 **Working features:**
 - Camera access with front/back switching
@@ -24,7 +24,9 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 - Push-up form detection (depth, hip sag/pike, elbow flare)
 - Video recording with local download
 - Recording history with IndexedDB persistence
-- Password protection for small group access
+- Multi-user authentication with user identity (id, name, isAdmin)
+- Admin-controlled app lock with Cloudflare KV persistence
+- Per-user cloud storage folders (userId prefix in R2 paths)
 - Responsive mobile-first layout
 - Secure cloud uploads via Cloudflare R2 (presigned URLs, no client credentials)
 - Continuous background recording with progressive chunk saving
@@ -67,10 +69,15 @@ Real-time visual feedback on exercise form — the skeleton overlay and posture 
 
 (None — all current requirements shipped)
 
+**Validated in v3.0:**
+- Multi-user authentication with user identity (id, name, isAdmin) — v3.0
+- Admin-controlled app lock for blocking non-admin users — v3.0
+- Per-user cloud storage folders in R2 — v3.0
+
 ### Out of Scope
 
 - Client-side credential storage — presigned URLs keep credentials server-side
-- Complex user management (simple auth only) — small group doesn't need it
+- Admin UI for user management — env var config sufficient for small group
 - Overlay burned into recordings — user wants clean video files
 - Rep counting or joint angle stats — posture alerts are the focus
 - Native mobile apps — web app covers both platforms
@@ -121,6 +128,13 @@ S3 upload (deferred to v2) means users would configure their own bucket credenti
 | Native IndexedDB API (no wrapper) | Simple use case, fewer dependencies | ✓ Good |
 | Auto-increment id for recordings | Simplifies storage layer | ✓ Good |
 | Modal overlay with click-to-close | Intuitive UX for recording history | ✓ Good |
+| Store User object in localStorage | Session persistence across refreshes | ✓ Good |
+| VITE_USERS JSON env var | Simple multi-user config without database | ✓ Good |
+| VITE_APP_PASSWORD fallback | Backward compatibility with single-user | ✓ Good |
+| Cloudflare KV for app lock | Global state persistence, serverless | ✓ Good |
+| 30-second polling for lock state | Balance freshness vs API calls | ✓ Good |
+| Admins immune to lock | Admin always has access to manage | ✓ Good |
+| userId prefix in R2 paths | Per-user organization without database | ✓ Good |
 
 ---
-*Last updated: 2026-01-21 after v2.3 milestone*
+*Last updated: 2026-01-22 after v3.0 milestone*

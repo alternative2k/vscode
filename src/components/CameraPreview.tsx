@@ -7,6 +7,7 @@ import { useRecordingHistory } from '../hooks/useRecordingHistory';
 import { useCloudUpload } from '../hooks/useCloudUpload';
 import { useContinuousRecording } from '../hooks/useContinuousRecording';
 import { useFullscreen } from '../hooks/useFullscreen';
+import { useAuth } from '../hooks/useAuth';
 import { uploadToCloud } from '../utils/cloudUpload';
 import { PoseCanvas } from './PoseCanvas';
 import { AlertOverlay } from './AlertOverlay';
@@ -36,6 +37,7 @@ export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
   const { landmarks, isDetecting } = usePoseDetection(videoRef, facingMode);
   const { isFullscreen, toggleFullscreen, isSupported: fullscreenSupported } = useFullscreen();
+  const { user } = useAuth();
 
   // Orientation tracking
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(getOrientation);
@@ -121,7 +123,7 @@ export function CameraPreview() {
     error: continuousError,
     uploadProgress,
     hasRetries: continuousHasRetries,
-  } = useContinuousRecording(stream, { autoStart: true });
+  } = useContinuousRecording(stream, { autoStart: true, userId: user?.id });
 
   // Handle save recording to IndexedDB
   const handleSaveRecording = useCallback(async () => {

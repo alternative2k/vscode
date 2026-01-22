@@ -1,13 +1,38 @@
 import { CameraPreview } from './components/CameraPreview';
 import { PasswordGate } from './components/PasswordGate';
 import { useAuth } from './hooks/useAuth';
+import { useAppLock } from './hooks/useAppLock';
 
 function App() {
   const { isAuthed, user, login, logout } = useAuth();
+  const { isLocked, isLoading: isLockLoading, toggleLock } = useAppLock();
 
   // Show password gate if not authenticated
   if (!isAuthed) {
     return <PasswordGate onLogin={login} />;
+  }
+
+  // Show locked screen for non-admin users when app is locked
+  if (isLocked && !user?.isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔒</div>
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+            App Locked
+          </h1>
+          <p className="text-gray-400 text-sm md:text-base mb-6">
+            The app is currently locked by an administrator.
+          </p>
+          <button
+            onClick={logout}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // Main app when authenticated
@@ -20,8 +45,25 @@ function App() {
           Real-time exercise form feedback
         </p>
 
-        {/* User info and logout - small, unobtrusive */}
+        {/* User info, lock toggle (admin), and logout - small, unobtrusive */}
         <div className="absolute top-4 right-4 flex items-center gap-2">
+          {/* Lock toggle - admin only */}
+          {user?.isAdmin && (
+            <button
+              onClick={toggleLock}
+              disabled={isLockLoading}
+              className={`text-xs px-2 py-1 rounded transition-colors ${
+                isLocked
+                  ? 'bg-red-600 hover:bg-red-500 text-white'
+                  : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+              } ${isLockLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              aria-label={isLocked ? 'Unlock app' : 'Lock app'}
+              title={isLocked ? 'App is locked - click to unlock' : 'Click to lock app'}
+            >
+              {isLockLoading ? '...' : isLocked ? '🔒 Locked' : '🔓 Unlocked'}
+            </button>
+          )}
+
           <span className="text-gray-400 text-xs">
             {user?.name}
             {user?.isAdmin && (

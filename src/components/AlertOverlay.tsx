@@ -26,8 +26,8 @@ export function AlertOverlay({ alert }: AlertOverlayProps) {
       {/* Animated border for warning indicator - color based on severity */}
       <div className={`absolute inset-0 border-4 ${borderColor} animate-pulse rounded-lg`} />
 
-      {/* Alert message - positioned below controls on mobile, centered at top on larger screens */}
-      <div className="absolute top-14 left-4 right-4 sm:top-4 sm:left-0 sm:right-0 flex justify-center">
+      {/* Alert message - positioned below recording timer (top-14 gives space for REC indicator) */}
+      <div className="absolute top-14 left-4 right-4 flex justify-center">
         <div className={`${bannerBg} ${textColor} px-3 py-2 rounded-lg shadow-lg max-w-[90%] sm:max-w-md`}>
           <p className="text-xs sm:text-sm md:text-base font-medium text-center leading-tight">
             {alert.message}

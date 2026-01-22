@@ -33,10 +33,10 @@ Plans:
 **Goal:** Add Cloudflare KV-based global lock that admin can toggle to block all non-admin users
 **Depends on:** Phase 15
 **Research:** Unlikely (simple API + KV integration)
-**Plans:** TBD
+**Plans:** 1
 
 Plans:
-- [ ] 16-01: TBD (run /gsd:plan-phase 16 to break down)
+- [x] 16-01: Admin app lock with KV storage — completed 2026-01-22
 
 ### Phase 17: User Cloud Folders
 
@@ -119,5 +119,5 @@ Plans:
 | 13. Status Indicator | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 14. Resilient Upload | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 15. Multi-User Auth | v3.0 | 1/1 | Complete | 2026-01-22 |
-| 16. Admin App Lock | v3.0 | 0/? | Not started | - |
+| 16. Admin App Lock | v3.0 | 1/1 | Complete | 2026-01-22 |
 | 17. User Cloud Folders | v3.0 | 0/? | Not started | - |

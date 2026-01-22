@@ -30,6 +30,42 @@ interface UseContinuousRecordingOptions {
   userId?: string;  // User ID for cloud folder organization
 }
 
+/**
+ * Finds the byte offset of the first WebM Cluster element in an ArrayBuffer.
+ * WebM Cluster element ID is 0x1F43B675.
+ * Returns -1 if no Cluster found.
+ */
+function findClusterOffset(buffer: ArrayBuffer): number {
+  const view = new Uint8Array(buffer);
+  // Cluster element ID: 0x1F, 0x43, 0xB6, 0x75
+  for (let i = 0; i < view.length - 3; i++) {
+    if (view[i] === 0x1F && view[i + 1] === 0x43 && view[i + 2] === 0xB6 && view[i + 3] === 0x75) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+/**
+ * Extracts the WebM initialization segment from the first chunk.
+ * The init segment contains EBML header, Segment info, and Track info -
+ * everything before the first Cluster element.
+ */
+function extractInitSegment(buffer: ArrayBuffer): ArrayBuffer | null {
+  const clusterOffset = findClusterOffset(buffer);
+  if (clusterOffset <= 0) {
+    return null;
+  }
+  return buffer.slice(0, clusterOffset);
+}
+
+/**
+ * Prepends the initialization segment to a chunk's data to make it independently playable.
+ */
+function prependInitSegment(initSegment: ArrayBuffer, chunkData: ArrayBuffer): Blob {
+  return new Blob([initSegment, chunkData], { type: 'video/webm' });
+}
+
 // Get supported MIME type (same pattern as useRecording)
 function getSupportedMimeType(): string {
   const types = [
@@ -68,6 +104,8 @@ export function useContinuousRecording(
   const sessionIdRef = useRef<string | null>(null);
   const isEnabledRef = useRef<boolean>(false);
   const isUploadingRef = useRef<boolean>(false);
+  // Store WebM initialization segment (EBML header + Segment info + Tracks) for prepending to subsequent chunks
+  const initSegmentRef = useRef<ArrayBuffer | null>(null);
 
   // Keep refs in sync with state for use in event handlers
   useEffect(() => {
@@ -180,6 +218,7 @@ export function useContinuousRecording(
       sessionIdRef.current = newSessionId;
       setSessionId(newSessionId);
       chunkIndexRef.current = 0;
+      initSegmentRef.current = null; // Reset init segment for new session
       setChunkCount(0);
       setError(null);
 
@@ -203,11 +242,30 @@ export function useContinuousRecording(
           const currentChunkIndex = chunkIndexRef.current++;
 
           try {
+            let blobToSave: Blob;
+
+            if (currentChunkIndex === 0) {
+              // First chunk: extract and store the init segment, save full chunk as-is
+              const arrayBuffer = await event.data.arrayBuffer();
+              const initSegment = extractInitSegment(arrayBuffer);
+              if (initSegment) {
+                initSegmentRef.current = initSegment;
+              }
+              blobToSave = event.data;
+            } else if (initSegmentRef.current) {
+              // Subsequent chunks: prepend init segment to make independently playable
+              const arrayBuffer = await event.data.arrayBuffer();
+              blobToSave = prependInitSegment(initSegmentRef.current, arrayBuffer);
+            } else {
+              // Fallback: no init segment available, save raw (won't be playable standalone)
+              blobToSave = event.data;
+            }
+
             // Save chunk to IndexedDB immediately (don't accumulate in memory)
             await saveChunk({
               sessionId: sessionIdRef.current,
               chunkIndex: currentChunkIndex,
-              blob: event.data,
+              blob: blobToSave,
               timestamp: Date.now(),
               uploaded: false,
             });

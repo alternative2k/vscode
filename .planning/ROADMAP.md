@@ -26,7 +26,7 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 **Plans:** TBD
 
 Plans:
-- [ ] 15-01: TBD (run /gsd:plan-phase 15 to break down)
+- [x] 15-01: Multi-user auth system — completed 2026-01-22
 
 ### Phase 16: Admin App Lock
 
@@ -118,6 +118,6 @@ Plans:
 | 12. Auto-Start Recording | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 13. Status Indicator | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 14. Resilient Upload | v2.3 | 1/1 | Complete | 2026-01-21 |
-| 15. Multi-User Auth | v3.0 | 0/? | Not started | - |
+| 15. Multi-User Auth | v3.0 | 1/1 | Complete | 2026-01-22 |
 | 16. Admin App Lock | v3.0 | 0/? | Not started | - |
 | 17. User Cloud Folders | v3.0 | 0/? | Not started | - |

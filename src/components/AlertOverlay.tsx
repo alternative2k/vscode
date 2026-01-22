@@ -26,9 +26,11 @@ export function AlertOverlay({ alert }: AlertOverlayProps) {
       {/* Animated border for warning indicator - color based on severity */}
       <div className={`absolute inset-0 border-4 ${borderColor} animate-pulse rounded-lg`} />
 
-      {/* Alert message - positioned below recording timer (top-14 gives space for REC indicator) */}
-      <div className="absolute top-14 left-4 right-4 flex justify-center">
-        <div className={`${bannerBg} ${textColor} px-3 py-2 rounded-lg shadow-lg max-w-[90%] sm:max-w-md`}>
+      {/* Alert message - positioned at top center, avoiding left/right control panels */}
+      {/* On mobile: left-20 avoids left panel (tracking status, skeleton toggle, continuous recording) */}
+      {/* On mobile: right-20 avoids right panel (exercise mode selector, lock button area) */}
+      <div className="absolute top-4 left-20 right-20 md:left-1/4 md:right-1/4 flex justify-center">
+        <div className={`${bannerBg} ${textColor} px-3 py-2 rounded-lg shadow-lg max-w-full`}>
           <p className="text-xs sm:text-sm md:text-base font-medium text-center leading-tight">
             {alert.message}
           </p>

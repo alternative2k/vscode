@@ -39,44 +39,83 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">
       {/* Header - compact on mobile, more spacious on desktop */}
-      <header className="py-4 md:py-6 px-4 text-center shrink-0 relative">
-        <h1 className="text-2xl md:text-4xl font-bold text-white">FormCheck</h1>
-        <p className="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">
-          Real-time exercise form feedback
-        </p>
+      <header className="py-4 md:py-6 px-4 shrink-0">
+        {/* Mobile: stacked layout with title/controls separated */}
+        {/* Desktop: title centered with absolute positioned controls */}
+        <div className="flex flex-col md:block md:relative md:text-center">
+          {/* Mobile header row: title left, controls right */}
+          <div className="flex items-center justify-between md:hidden mb-1">
+            <h1 className="text-2xl font-bold text-white">FormCheck</h1>
+            {/* Mobile controls */}
+            <div className="flex items-center gap-2">
+              {/* Lock toggle - admin only */}
+              {user?.isAdmin && (
+                <button
+                  onClick={toggleLock}
+                  disabled={isLockLoading}
+                  className={`text-xs px-2 py-1 rounded transition-colors ${
+                    isLocked
+                      ? 'bg-red-600 hover:bg-red-500 text-white'
+                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                  } ${isLockLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  aria-label={isLocked ? 'Unlock app' : 'Lock app'}
+                  title={isLocked ? 'App is locked - click to unlock' : 'Click to lock app'}
+                >
+                  {isLockLoading ? '...' : isLocked ? 'Locked' : 'Unlocked'}
+                </button>
+              )}
+              <button
+                onClick={logout}
+                className="text-gray-500 hover:text-gray-300 text-xs transition-colors"
+                aria-label="Logout"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+          <p className="text-gray-400 text-xs md:hidden">
+            Real-time exercise form feedback
+          </p>
 
-        {/* User info, lock toggle (admin), and logout - small, unobtrusive */}
-        <div className="absolute top-4 right-4 flex items-center gap-2">
-          {/* Lock toggle - admin only */}
-          {user?.isAdmin && (
-            <button
-              onClick={toggleLock}
-              disabled={isLockLoading}
-              className={`text-xs px-2 py-1 rounded transition-colors ${
-                isLocked
-                  ? 'bg-red-600 hover:bg-red-500 text-white'
-                  : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-              } ${isLockLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              aria-label={isLocked ? 'Unlock app' : 'Lock app'}
-              title={isLocked ? 'App is locked - click to unlock' : 'Click to lock app'}
-            >
-              {isLockLoading ? '...' : isLocked ? '🔒 Locked' : '🔓 Unlocked'}
-            </button>
-          )}
+          {/* Desktop: centered title */}
+          <h1 className="hidden md:block text-4xl font-bold text-white">FormCheck</h1>
+          <p className="hidden md:block text-gray-400 text-sm mt-2">
+            Real-time exercise form feedback
+          </p>
 
-          <span className="text-gray-400 text-xs">
-            {user?.name}
+          {/* Desktop: absolute positioned controls */}
+          <div className="hidden md:flex absolute top-4 right-4 items-center gap-2">
+            {/* Lock toggle - admin only */}
             {user?.isAdmin && (
-              <span className="text-blue-400 ml-1">(Admin)</span>
+              <button
+                onClick={toggleLock}
+                disabled={isLockLoading}
+                className={`text-xs px-2 py-1 rounded transition-colors ${
+                  isLocked
+                    ? 'bg-red-600 hover:bg-red-500 text-white'
+                    : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                } ${isLockLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                aria-label={isLocked ? 'Unlock app' : 'Lock app'}
+                title={isLocked ? 'App is locked - click to unlock' : 'Click to lock app'}
+              >
+                {isLockLoading ? '...' : isLocked ? 'Locked' : 'Unlocked'}
+              </button>
             )}
-          </span>
-          <button
-            onClick={logout}
-            className="text-gray-500 hover:text-gray-300 text-xs md:text-sm transition-colors"
-            aria-label="Logout"
-          >
-            Logout
-          </button>
+
+            <span className="text-gray-400 text-xs">
+              {user?.name}
+              {user?.isAdmin && (
+                <span className="text-blue-400 ml-1">(Admin)</span>
+              )}
+            </span>
+            <button
+              onClick={logout}
+              className="text-gray-500 hover:text-gray-300 text-xs md:text-sm transition-colors"
+              aria-label="Logout"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 

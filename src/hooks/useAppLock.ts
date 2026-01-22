@@ -12,6 +12,7 @@ interface UseAppLockReturn {
 }
 
 const POLL_INTERVAL = 30000; // 30 seconds
+const TOGGLE_COOLDOWN = 5000; // 5 seconds - ignore polls after toggle to prevent race condition
 
 export function useAppLock(): UseAppLockReturn {
   const [state, setState] = useState<LockState>({
@@ -19,17 +20,28 @@ export function useAppLock(): UseAppLockReturn {
     isLoading: true,
   });
   const pollIntervalRef = useRef<number | null>(null);
+  // Track when toggle was last called to prevent poll from overwriting optimistic update
+  const lastToggleTimeRef = useRef<number>(0);
 
-  const fetchLockStatus = useCallback(async () => {
+  const fetchLockStatus = useCallback(async (isInitialFetch = false) => {
+    // Skip poll if within cooldown period after a toggle (prevents race condition)
+    // Always allow initial fetch on mount
+    if (!isInitialFetch && Date.now() - lastToggleTimeRef.current < TOGGLE_COOLDOWN) {
+      return;
+    }
+
     try {
       const response = await fetch('/api/app-lock');
       if (response.ok) {
         const data = await response.json();
-        setState(prev => ({
-          ...prev,
-          isLocked: data.locked ?? false,
-          isLoading: false,
-        }));
+        // Double-check we're still outside cooldown (in case toggle happened during fetch)
+        if (isInitialFetch || Date.now() - lastToggleTimeRef.current >= TOGGLE_COOLDOWN) {
+          setState(prev => ({
+            ...prev,
+            isLocked: data.locked ?? false,
+            isLoading: false,
+          }));
+        }
       } else {
         // Default to unlocked on error
         setState(prev => ({ ...prev, isLocked: false, isLoading: false }));
@@ -41,14 +53,14 @@ export function useAppLock(): UseAppLockReturn {
     }
   }, []);
 
-  // Fetch on mount
+  // Fetch on mount (initial fetch - always allowed)
   useEffect(() => {
-    fetchLockStatus();
+    fetchLockStatus(true);
   }, [fetchLockStatus]);
 
   // Poll every 30 seconds
   useEffect(() => {
-    pollIntervalRef.current = window.setInterval(fetchLockStatus, POLL_INTERVAL);
+    pollIntervalRef.current = window.setInterval(() => fetchLockStatus(false), POLL_INTERVAL);
 
     return () => {
       if (pollIntervalRef.current !== null) {
@@ -59,6 +71,9 @@ export function useAppLock(): UseAppLockReturn {
 
   const toggleLock = useCallback(async () => {
     const newLocked = !state.isLocked;
+
+    // Mark toggle time to prevent poll from overwriting during cooldown
+    lastToggleTimeRef.current = Date.now();
 
     // Optimistic update
     setState(prev => ({ ...prev, isLocked: newLocked }));
@@ -71,12 +86,14 @@ export function useAppLock(): UseAppLockReturn {
       });
 
       if (!response.ok) {
-        // Revert on failure
+        // Revert on failure and clear cooldown to allow poll to correct state
+        lastToggleTimeRef.current = 0;
         setState(prev => ({ ...prev, isLocked: !newLocked }));
         console.error('Failed to toggle lock status');
       }
     } catch (error) {
-      // Revert on error
+      // Revert on error and clear cooldown to allow poll to correct state
+      lastToggleTimeRef.current = 0;
       setState(prev => ({ ...prev, isLocked: !newLocked }));
       console.error('Failed to toggle lock status:', error);
     }

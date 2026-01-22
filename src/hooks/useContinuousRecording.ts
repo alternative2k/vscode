@@ -27,6 +27,7 @@ interface UseContinuousRecordingReturn {
 
 interface UseContinuousRecordingOptions {
   autoStart?: boolean;
+  userId?: string;  // User ID for cloud folder organization
 }
 
 // Get supported MIME type (same pattern as useRecording)
@@ -112,7 +113,7 @@ export function useContinuousRecording(
       let uploadedCount = 0;
       for (const chunk of pendingChunks) {
         try {
-          const result = await uploadChunk(chunk.blob, forSessionId, chunk.chunkIndex);
+          const result = await uploadChunk(chunk.blob, forSessionId, chunk.chunkIndex, options?.userId);
           if (result.success && chunk.id !== undefined) {
             await markChunkUploaded(chunk.id);
             uploadedCount++;
@@ -168,7 +169,7 @@ export function useContinuousRecording(
         setState('idle');
       }
     }
-  }, []);
+  }, [options?.userId]);
 
   // Start a new recording session
   const startRecording = useCallback(async () => {

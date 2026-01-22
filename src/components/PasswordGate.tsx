@@ -1,7 +1,8 @@
 import { useState, FormEvent } from 'react';
+import type { User } from '../types/auth';
 
 interface PasswordGateProps {
-  onLogin: (password: string) => boolean;
+  onLogin: (password: string) => User | null;
 }
 
 export function PasswordGate({ onLogin }: PasswordGateProps) {
@@ -10,11 +11,12 @@ export function PasswordGate({ onLogin }: PasswordGateProps) {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const success = onLogin(password);
-    if (!success) {
+    const user = onLogin(password);
+    if (!user) {
       setError(true);
       setPassword('');
     }
+    // On success, parent handles state change and this component unmounts
   };
 
   return (

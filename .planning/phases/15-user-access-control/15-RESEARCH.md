@@ -1,302 +1,382 @@
 # Phase 15: User Access Control - Research
 
 **Researched:** 2026-01-22
-**Domain:** React authentication + access control for browser-based app
+**Domain:** React authentication + admin-controlled access for browser-based app
 **Confidence:** HIGH
 
 <research_summary>
 ## Summary
 
-Researched multi-user access control options for FormCheck, a React/Vite/TypeScript app currently using a single shared password stored in localStorage.
+Researched multi-user access control for FormCheck with these specific requirements:
+1. **Admin account** can lock/unlock app for all other users
+2. **User folders** in cloud storage based on unique user identifier
+3. **Easy user management** - simple way to add new users
 
-The app has no backend - it's a static site (Cloudflare Pages/Vercel). This constrains options significantly. True secure multi-user auth requires a backend for password hashing and session management. However, there are pragmatic client-side approaches for small group access that work with the current architecture.
+The app has no backend currently. For admin-controlled app locking and dynamic user management, we need **minimal backend state** - but it can be very lightweight (a single JSON file or KV entry).
 
-**Primary recommendation:** For your use case (small group access, time-based restrictions), use a **multi-password system with optional time windows** stored in environment variables. This extends the current pattern efficiently without requiring a backend.
+**Primary recommendation:** Use **localStorage-synced lock state** with a Cloudflare KV flag that admin can toggle. Users are defined in env vars with unique IDs. Cloud uploads go to `userId/date/session/` folder structure.
 </research_summary>
 
 <current_system>
-## Current Authentication System
+## Current System Analysis
 
-**Location:** `src/hooks/useAuth.ts` + `src/components/PasswordGate.tsx`
+**Authentication:** `src/hooks/useAuth.ts` + `src/components/PasswordGate.tsx`
+- Single password from `VITE_APP_PASSWORD` env var
+- Stores `formcheck_authed: 'true'` in localStorage
+- No user identity, no roles
 
-**How it works:**
-- Single password from `VITE_APP_PASSWORD` env var (default: 'formcheck2024')
-- Validates client-side, stores `formcheck_authed: 'true'` in localStorage
-- Session persists across browser restarts (convenience auth, not security)
-- No user identity - everyone is anonymous once authenticated
-- Logout clears localStorage
+**Cloud Upload:** `src/utils/cloudUpload.ts`
+- Current path structure: `{date}/{sessionId}/chunk-XXXX.webm`
+- Example: `2026-01-21/abc-123/chunk-0001.webm`
+- Uses presigned URLs from `/api/upload-url` Pages Function
+- Easy to prepend user folder to path
 
-**Limitations for multi-user:**
-- Single shared password = no user differentiation
-- No tracking of who did what
-- No time-based restrictions
-- No per-user settings or recording attribution
+**Pages Function:** `/api/upload-url`
+- Already exists for R2 presigned URL generation
+- Can be extended to check lock status from KV
 </current_system>
 
-<options_analysis>
-## Options Analysis
+<refined_requirements>
+## Refined Requirements
 
-### Option 1: Multi-Password System (Recommended)
-**What:** Multiple passwords in env config, each optionally tied to a user name and time window
-**Effort:** Low (extend existing pattern)
-**Security:** Same as current (client-side, obfuscated but not secure)
+### From User Feedback:
+1. **Global app lock** - Admin can lock app for ALL non-admin users (not per-user time windows)
+2. **Admin account** - Special account that can toggle lock and always has access
+3. **User folders** - Each user gets unique ID used in cloud path: `{userId}/{date}/{session}/`
+4. **Easy user management** - Adding users should be simple
 
-```typescript
-// .env config format
+### Derived Requirements:
+- Need persistent lock state (survives page refresh, works across browsers)
+- Need admin UI to toggle lock
+- Need user identity with unique ID (not just name)
+- Lock check must happen at app load and periodically
+</refined_requirements>
+
+<architecture_options>
+## Architecture Options
+
+### Option A: KV-Based Lock + Env Users (Recommended)
+**Lock state:** Cloudflare KV (single boolean key)
+**User list:** Environment variables at build time
+**Effort:** Low-Medium
+
+```
+┌─────────────┐     ┌──────────────────┐     ┌─────────────┐
+│   Browser   │────▶│  Pages Function  │────▶│ Cloudflare  │
+│  (React)    │     │  /api/app-lock   │     │     KV      │
+└─────────────┘     └──────────────────┘     └─────────────┘
+      │                                            │
+      │ Check lock on load                         │
+      │ Admin can toggle                           │
+      └────────────────────────────────────────────┘
+```
+
+**User config (.env):**
+```
 VITE_USERS='[
-  {"name": "Sean", "password": "sean2024", "allowedHours": null},
-  {"name": "Guest", "password": "guest123", "allowedHours": {"start": 9, "end": 17}}
+  {"id": "sean", "name": "Sean", "password": "sean2024", "isAdmin": true},
+  {"id": "guest1", "name": "Guest", "password": "guest123", "isAdmin": false}
 ]'
 ```
 
-**Pros:**
-- Works with current static deployment (no backend needed)
-- Easy to add/remove users via env vars
-- Can attribute recordings to users
-- Can restrict access by time window
-- Familiar pattern - just extends existing auth
-
-**Cons:**
-- Passwords visible in JS bundle (obfuscation only, not secure)
-- Can't revoke access instantly (need redeploy)
-- Limited to what's in env at build time
-
-### Option 2: Simple Backend Auth Service
-**What:** Add a small API (Cloudflare Worker, Vercel Function) for user validation
-**Effort:** Medium (new backend component)
-**Security:** Higher (passwords never in client bundle)
+**Cloud path becomes:** `sean/2026-01-22/session-abc/chunk-0001.webm`
 
 **Pros:**
-- Passwords hashed and stored server-side
-- Can add/remove users without redeploy
-- True session management possible
-- Foundation for future features (quotas, audit logs)
+- Lock is instant (no redeploy)
+- KV is free tier on Cloudflare
+- Simple single API endpoint
+- Users still defined at build time (secure-ish)
 
 **Cons:**
-- Additional infrastructure to maintain
-- Adds complexity
-- Requires database or KV store for users
+- Adding users requires redeploy
+- Passwords still in bundle
 
-### Option 3: Third-Party Auth (Auth0, Clerk, Supabase Auth)
-**What:** Integrate existing auth provider
-**Effort:** Medium-High (external dependency)
-**Security:** Highest (managed by experts)
+### Option B: Full KV Users + Lock
+**Lock state:** Cloudflare KV
+**User list:** Also in Cloudflare KV (admin can add/remove)
+**Effort:** Medium
 
 **Pros:**
-- Production-grade security
-- OAuth/SSO support
-- Admin dashboard for user management
-- Magic links, MFA, etc.
+- Admin can add users without redeploy
+- More dynamic
 
 **Cons:**
-- Overkill for small group access
-- External dependency and potential costs
+- More complex API
+- Need admin UI for user management
+- Passwords stored in KV (need hashing)
+
+### Option C: Supabase/Firebase Auth
+**Lock state:** Database flag
+**User list:** Managed by auth provider
+**Effort:** High
+
+**Pros:**
+- Proper security
+- Full user management UI
+- Password hashing, sessions, etc.
+
+**Cons:**
+- Overkill for small group
+- External dependency
 - More complex integration
-
-### Option 4: Frontend-Only RBAC Libraries
-**What:** Use react-access-control or permify/react-role
-**Effort:** Low-Medium
-**Security:** Same as current (client-side only)
-
-**Pros:**
-- Established patterns
-- Role-based access out of the box
-
-**Cons:**
-- Still need authentication layer (these handle authorization, not authentication)
-- Roles visible in client (not secure)
-</options_analysis>
+</architecture_options>
 
 <recommendation>
-## Recommendation: Option 1 - Multi-Password System
+## Recommendation: Option A - KV Lock + Env Users
 
-For your stated goals:
-1. **"Allow different people to use it"** → Multiple passwords, each tied to a name
-2. **"Restrict when people can use the app"** → Optional time window per user
-3. **"Work with current system"** → Extends existing useAuth pattern
-4. **"Not too hard to create"** → ~50-100 lines of code changes
-5. **"Must be efficient"** → No additional infrastructure, no API calls
+Best balance of your requirements:
+
+| Requirement | Solution |
+|-------------|----------|
+| Admin can lock app | KV flag toggled via API |
+| Lock affects all users | Single global flag checked on load |
+| User folders in cloud | User ID from config in upload path |
+| Easy to add users | Edit .env and redeploy (or Option B later) |
 
 ### Proposed Design
 
-**Configuration (build-time via env):**
+**User Configuration:**
+```typescript
+interface UserConfig {
+  id: string;        // Unique ID for folder: "sean", "john", "guest1"
+  name: string;      // Display name: "Sean"
+  password: string;  // Login password
+  isAdmin: boolean;  // Can toggle lock, immune to lock
+}
 ```
-VITE_USERS=[{"name":"Sean","pw":"sean2024"},{"name":"Guest","pw":"guest123","hours":{"from":9,"to":17}}]
+
+**Lock State (KV):**
+```typescript
+// Key: "app-locked"
+// Value: { locked: boolean, lockedBy: string, lockedAt: string }
+{
+  "locked": true,
+  "lockedBy": "sean",
+  "lockedAt": "2026-01-22T10:30:00Z"
+}
 ```
 
-**Authentication flow:**
-1. User enters password in PasswordGate
-2. `useAuth` checks password against all configured users
-3. On match: store `{name, authenticatedAt}` in localStorage (not just 'true')
-4. If user has time restriction, validate current hour
-5. Show user name in header, attribute recordings to user
+**Authentication Flow:**
+1. User enters password → match against user list → get user object
+2. Store `{ id, name, isAdmin, authenticatedAt }` in localStorage
+3. Check KV lock status via `/api/app-lock`
+4. If locked AND not admin → show "App locked by admin" message
+5. If admin → show lock/unlock toggle in header
 
-**Time restriction logic:**
-- Check on initial login
-- Optional: periodic re-check while app is open
-- Outside allowed hours → show "Access restricted" message
+**Cloud Upload Path:**
+```typescript
+// Current: {date}/{sessionId}/chunk-XXXX.webm
+// New:     {userId}/{date}/{sessionId}/chunk-XXXX.webm
 
-**Recording attribution:**
-- Add `userName` field to `StoredRecording` interface
-- Add `userName` to `ContinuousSession` interface
-- Filter recordings by user in history view (optional)
+function getUploadPath(userId: string, sessionId: string, chunkIndex: number): string {
+  const date = new Date().toISOString().split('T')[0];
+  return `${userId}/${date}/${sessionId}/chunk-${String(chunkIndex).padStart(4, '0')}.webm`;
+}
+```
+
+**Result in R2:**
+```
+formcheck-bucket/
+├── sean/
+│   ├── 2026-01-22/
+│   │   ├── session-abc/
+│   │   │   ├── chunk-0001.webm
+│   │   │   └── chunk-0002.webm
+│   │   └── session-def/
+│   │       └── chunk-0001.webm
+│   └── 2026-01-23/
+│       └── ...
+├── guest1/
+│   └── 2026-01-22/
+│       └── ...
+```
 </recommendation>
 
 <implementation_outline>
 ## Implementation Outline
 
+### New Files
+
+1. **`functions/api/app-lock.ts`** - Pages Function for lock state
+   ```typescript
+   // GET: Return current lock status
+   // POST: Toggle lock (admin only, check password)
+   ```
+
 ### Files to Modify
 
-1. **`src/hooks/useAuth.ts`** - Core changes
-   - Parse `VITE_USERS` JSON config
-   - Match password against user list
-   - Store user identity (not just boolean)
-   - Add time window validation
-   - Export current user name
+1. **`src/hooks/useAuth.ts`** - Major changes
+   - Parse `VITE_USERS` JSON array
+   - Return full user object (id, name, isAdmin)
+   - Add `checkLockStatus()` function
+   - Add `toggleLock()` function for admin
 
-2. **`src/components/PasswordGate.tsx`** - Minor UI updates
-   - Show time restriction message if applicable
-   - Optional: show "Welcome, {name}" after login
+2. **`src/components/PasswordGate.tsx`** - Show lock message
+   - After auth, check lock status
+   - Show "App locked by admin" if locked and not admin
 
-3. **`src/types/recording.ts`** - Add user field
-   - Add `userName?: string` to `StoredRecording`
-   - Add `userName?: string` to `ContinuousSession`
+3. **`src/App.tsx`** - Admin controls
+   - Show lock toggle button for admin users
+   - Display current user name
 
-4. **`src/hooks/useRecording.ts`** - Pass user
-   - Include `userName` when saving recordings
+4. **`src/utils/cloudUpload.ts`** - Add userId to paths
+   - `uploadChunk()` takes userId parameter
+   - `uploadToCloud()` takes userId parameter
+   - Modify path generation
 
-5. **`src/hooks/useContinuousRecording.ts`** - Pass user
-   - Include `userName` when saving sessions/chunks
+5. **`src/hooks/useCloudUpload.ts`** - Pass userId
+   - Accept userId from auth context
+   - Pass to upload functions
 
-6. **`src/App.tsx`** - Show user in header
-   - Display logged-in user name
-   - Pass user context down
+6. **`src/hooks/useContinuousRecording.ts`** - Pass userId
+   - Include userId in upload calls
 
-7. **`.env.example`** - Document new config
-   - Add `VITE_USERS` example
+7. **`src/types/auth.ts`** (new) - Type definitions
+   ```typescript
+   interface User {
+     id: string;
+     name: string;
+     isAdmin: boolean;
+   }
+
+   interface LockStatus {
+     locked: boolean;
+     lockedBy?: string;
+     lockedAt?: string;
+   }
+   ```
+
+8. **`.env.example`** - Document new config
 
 ### Estimated Scope
-- ~100-150 lines of code changes
-- 1 plan to execute
-- No new dependencies
-- No infrastructure changes
+- ~200-250 lines of code changes
+- 1 new Pages Function (~50 lines)
+- 1-2 plans to execute
+- No new npm dependencies
 </implementation_outline>
 
-<time_restrictions>
-## Time Restriction Feature Detail
+<user_management>
+## User Management Options
 
-### Configuration Format
-```json
-{
-  "name": "Guest",
-  "password": "guest123",
-  "allowedHours": {
-    "start": 9,
-    "end": 17,
-    "timezone": "local"
-  }
-}
-```
+### Current Approach (Env Vars)
+**Adding a user:**
+1. Edit `.env` or deployment env vars
+2. Add user to `VITE_USERS` array
+3. Redeploy
 
-### Validation Logic
+**Pros:** Simple, no UI needed
+**Cons:** Requires redeploy
+
+### Future Enhancement: Admin Panel
+If you want admin to add users without redeploy:
+
+1. Store users in Cloudflare KV (not env)
+2. Add `/api/users` endpoint (CRUD)
+3. Add admin UI panel
+4. Hash passwords server-side
+
+This is Option B - more complex but more dynamic. Can be added later.
+
+### Simplest Alternative: Shared Invite Code
+Instead of individual passwords:
+1. Admin has unique password
+2. All other users share one "invite code"
+3. System generates unique ID on first login (stored in localStorage)
+
+**Pros:** No user management needed
+**Cons:** Can't revoke specific users, IDs not human-readable
+</user_management>
+
+<lock_mechanism>
+## Lock Mechanism Detail
+
+### KV Structure
 ```typescript
-function isWithinAllowedHours(user: UserConfig): boolean {
-  if (!user.allowedHours) return true; // No restriction
-
-  const now = new Date();
-  const hour = now.getHours(); // Local timezone
-
-  const { start, end } = user.allowedHours;
-
-  // Handle overnight ranges (e.g., 22-6)
-  if (start > end) {
-    return hour >= start || hour < end;
-  }
-
-  return hour >= start && hour < end;
+// Cloudflare KV namespace: FORMCHECK_CONFIG
+// Key: "app-locked"
+interface LockState {
+  locked: boolean;
+  lockedBy: string;    // Admin user ID who locked
+  lockedAt: string;    // ISO timestamp
+  message?: string;    // Optional message to show users
 }
 ```
 
-### UX Considerations
-- Show clear message when access is time-restricted
-- Display allowed hours to user
-- Option: countdown to when access opens
-- Consider: 5-minute grace period at boundaries?
-</time_restrictions>
+### API Endpoint: `/api/app-lock`
+
+**GET** - Check lock status (anyone can call)
+```typescript
+// Response
+{ locked: false }
+// or
+{ locked: true, lockedBy: "sean", lockedAt: "2026-01-22T10:30:00Z" }
+```
+
+**POST** - Toggle lock (admin only)
+```typescript
+// Request
+{ action: "lock" | "unlock", adminId: string, adminPassword: string }
+
+// Response
+{ success: true, locked: true }
+```
+
+### Client-Side Behavior
+1. **On app load:** Fetch `/api/app-lock`
+2. **If locked + not admin:** Show lock screen, don't load main app
+3. **Periodic check:** Every 60 seconds while app is open
+4. **Admin toggle:** POST to endpoint, update local state
+</lock_mechanism>
 
 <security_notes>
 ## Security Notes
 
-**This is NOT secure authentication.**
+**Same limitations as before:**
+- Passwords in JS bundle (obfuscation, not security)
+- Client-side lock check can be bypassed by determined user
+- Suitable for trusted small group only
 
-All passwords are embedded in the JavaScript bundle at build time. Anyone with browser dev tools can extract them. This is **obfuscation for casual restriction**, not security.
+**Improvements over current:**
+- Lock state is server-side (KV) - can't be bypassed by clearing localStorage
+- Admin identity verified server-side for lock toggle
+- User IDs create audit trail in cloud storage
 
-**Acceptable for:**
-- Small group of trusted users
-- Preventing accidental public access
-- Basic usage attribution
-
-**NOT acceptable for:**
-- Sensitive data protection
-- Billing or payment features
-- Compliance requirements
-- Public-facing apps with untrusted users
-
-**If you need real security later:**
-- Add a backend auth service (Cloudflare Worker + D1/KV)
-- Use third-party auth (Clerk, Auth0, Supabase)
-- Current recordings in IndexedDB remain browser-local (not shared)
+**If you need real security:**
+- Move to backend auth (Option B or C)
+- Hash passwords server-side
+- Use JWT tokens instead of localStorage
 </security_notes>
-
-<alternative_approaches>
-## Alternative Approaches Considered
-
-### Invite Codes Instead of Passwords
-Generate unique codes per user, validate against list. Same security level but feels more "invitation-like."
-
-### Time-Based One-Time Passwords (TOTP)
-Use authenticator apps (Google Authenticator). Requires shared secret setup, more complex but no password to remember.
-
-### IP-Based Restrictions
-Allow access only from certain IPs. Requires backend or CDN-level rules. Breaks on mobile/dynamic IPs.
-
-### Magic Links (Email)
-Send login link to email. Requires backend email service. Better UX but more infrastructure.
-
-**Verdict:** Multi-password system is simplest for your stated requirements.
-</alternative_approaches>
 
 <sources>
 ## Sources
 
 ### Primary (HIGH confidence)
-- Current codebase analysis: `src/hooks/useAuth.ts`, `src/components/PasswordGate.tsx`
-- Vite environment variables documentation
+- Current codebase: `src/hooks/useAuth.ts`, `src/utils/cloudUpload.ts`
+- Cloudflare KV documentation
+- Cloudflare Pages Functions documentation
 
 ### Secondary (MEDIUM confidence)
-- [JWT Storage in React: Local Storage vs Cookies](https://cybersierra.co/blog/react-jwt-storage-guide/) - Security considerations
-- [React Role (Permify)](https://permify.co/post/open-source-implement-role-based-access-management-with-permify-react-role/) - Frontend RBAC patterns
-- [LogRocket JWT Best Practices](https://blog.logrocket.com/jwt-authentication-best-practices/) - When localStorage is acceptable
-- [Jason Watmore's Tutorial](https://jasonwatmore.com/post/2019/02/01/react-role-based-authorization-tutorial-with-example) - Fake backend pattern for client-side auth
+- [Cloudflare KV bindings](https://developers.cloudflare.com/workers/runtime-apis/kv/) - KV usage patterns
+- [JWT Best Practices](https://blog.logrocket.com/jwt-authentication-best-practices/) - Security considerations
 </sources>
 
 <metadata>
 ## Metadata
 
 **Research scope:**
-- Core technology: React client-side auth
-- Ecosystem: localStorage, env vars, no backend
-- Patterns: Multi-password, time-based access
-- Pitfalls: Security limitations of client-side auth
+- Core: React auth with admin role
+- Ecosystem: Cloudflare KV for state, Pages Functions for API
+- Patterns: Global lock flag, user-prefixed cloud paths
+- Pitfalls: Client-side security limitations
 
 **Confidence breakdown:**
 - Current system analysis: HIGH - read actual code
-- Recommended approach: HIGH - extends proven pattern
-- Security assessment: HIGH - well-documented limitations
-- Implementation estimate: HIGH - straightforward changes
+- Recommended approach: HIGH - uses existing Cloudflare infrastructure
+- Implementation estimate: HIGH - straightforward extension
+- Security assessment: HIGH - known limitations documented
 
 **Research date:** 2026-01-22
-**Valid until:** Indefinite (commodity pattern, stable)
+**Valid until:** Indefinite (commodity patterns)
 </metadata>
 
 ---

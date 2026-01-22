@@ -8,61 +8,35 @@ interface ContinuousRecordingStatusProps {
 export function ContinuousRecordingStatus({
   state,
   error,
-  uploadProgress,
   hasRetries,
 }: ContinuousRecordingStatusProps) {
-  // Error state takes precedence
+  // Error state - red
   if (error) {
-    const truncatedError = error.length > 20 ? error.slice(0, 17) + '...' : error;
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-red-500/80 text-white">
-        <div className="w-2 h-2 rounded-full bg-white" />
-        {truncatedError}
-      </div>
+      <div className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
     );
   }
 
   // Recording state - green, pulsing
   if (state === 'recording') {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-green-500/80 text-white">
-        <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-        Recording
-      </div>
+      <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
     );
   }
 
-  // Uploading state - yellow/orange, pulsing with progress
+  // Uploading state - yellow/orange, pulsing
   if (state === 'uploading') {
-    const action = hasRetries ? 'Retrying' : 'Uploading';
-    const progressText = uploadProgress
-      ? `${action} ${uploadProgress.uploaded}/${uploadProgress.total}`
-      : action;
-    // Use orange for retries, yellow for regular uploads
-    const bgColor = hasRetries ? 'bg-orange-500/80' : 'bg-yellow-500/80';
+    const color = hasRetries ? 'bg-orange-500' : 'bg-yellow-500';
+    const shadow = hasRetries
+      ? 'shadow-[0_0_8px_rgba(249,115,22,0.8)]'
+      : 'shadow-[0_0_8px_rgba(234,179,8,0.8)]';
     return (
-      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${bgColor} text-white`}>
-        <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-        {progressText}
-      </div>
+      <div className={`w-3 h-3 rounded-full ${color} animate-pulse ${shadow}`} />
     );
   }
 
-  // Paused state - grey, no pulse
-  if (state === 'paused') {
-    return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-800/80 text-gray-300">
-        <div className="w-2 h-2 rounded-full bg-gray-500" />
-        Paused
-      </div>
-    );
-  }
-
-  // Idle state - grey, no pulse, "Standby"
+  // Paused/Idle state - grey, no pulse
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-800/80 text-gray-300">
-      <div className="w-2 h-2 rounded-full bg-gray-500" />
-      Standby
-    </div>
+    <div className="w-3 h-3 rounded-full bg-gray-500" />
   );
 }

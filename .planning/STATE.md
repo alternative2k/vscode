@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-21)
 
 **Core value:** Real-time visual feedback on exercise form — skeleton overlay and posture alerts must work reliably
-**Current focus:** Planning next milestone
+**Current focus:** v3.0 User Access Control
 
 ## Current Position
 
-Phase: 14 of 14 (Resilient Upload)
-Plan: 1/1 complete
-Status: Milestone v2.3 shipped
-Last activity: 2026-01-21 — Milestone v2.3 complete
+Phase: 15 of 17 (Multi-User Auth)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-01-22 — Milestone v3.0 created
 
-Progress: ██████████ 100%
+Progress: ░░░░░░░░░░ 0%
 
 ## Performance Metrics
 
@@ -64,9 +64,10 @@ None.
 - Milestone v2.1 shipped: Continuous Cloud Recording (Phases 7-9) — 2026-01-21
 - Milestone v2.2 shipped: UX Polish (Phases 10-11) — 2026-01-21
 - Milestone v2.3 shipped: Continuous Recording UX (Phases 12-14) — 2026-01-21
+- Milestone v3.0 created: User Access Control (Phases 15-17) — 2026-01-22
 
 ## Session Continuity
 
-Last session: 2026-01-21
-Stopped at: Milestone v2.3 shipped — Ready for next milestone planning
+Last session: 2026-01-22
+Stopped at: Milestone v3.0 initialization
 Resume file: None

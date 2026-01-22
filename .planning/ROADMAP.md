@@ -12,6 +12,41 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 - ✅ **v2.1 Continuous Cloud Recording** - [milestones/v2.1-ROADMAP.md](milestones/v2.1-ROADMAP.md) (Phases 7-9, shipped 2026-01-21)
 - ✅ **v2.2 UX Polish** - [milestones/v2.2-ROADMAP.md](milestones/v2.2-ROADMAP.md) (Phases 10-11, shipped 2026-01-21)
 - ✅ **v2.3 Continuous Recording UX** - [milestones/v2.3-ROADMAP.md](milestones/v2.3-ROADMAP.md) (Phases 12-14, shipped 2026-01-21)
+- 🚧 **v3.0 User Access Control** - Phases 15-17 (in progress)
+
+## Current Milestone: v3.0 User Access Control
+
+**Milestone Goal:** Multi-user authentication with admin-controlled app lock and per-user cloud storage folders.
+
+### Phase 15: Multi-User Auth
+
+**Goal:** Replace single shared password with multi-user system supporting user identity (id, name, password, isAdmin role)
+**Depends on:** Previous milestone complete
+**Research:** Complete ([15-RESEARCH.md](phases/15-user-access-control/15-RESEARCH.md))
+**Plans:** TBD
+
+Plans:
+- [ ] 15-01: TBD (run /gsd:plan-phase 15 to break down)
+
+### Phase 16: Admin App Lock
+
+**Goal:** Add Cloudflare KV-based global lock that admin can toggle to block all non-admin users
+**Depends on:** Phase 15
+**Research:** Unlikely (simple API + KV integration)
+**Plans:** TBD
+
+Plans:
+- [ ] 16-01: TBD (run /gsd:plan-phase 16 to break down)
+
+### Phase 17: User Cloud Folders
+
+**Goal:** Add userId prefix to all cloud upload paths for per-user organization in R2
+**Depends on:** Phase 16
+**Research:** Unlikely (path string modification)
+**Plans:** TBD
+
+Plans:
+- [ ] 17-01: TBD (run /gsd:plan-phase 17 to break down)
 
 ## Completed Milestones
 
@@ -83,3 +118,6 @@ Build a browser-based exercise form checker with real-time skeleton overlay and 
 | 12. Auto-Start Recording | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 13. Status Indicator | v2.3 | 1/1 | Complete | 2026-01-21 |
 | 14. Resilient Upload | v2.3 | 1/1 | Complete | 2026-01-21 |
+| 15. Multi-User Auth | v3.0 | 0/? | Not started | - |
+| 16. Admin App Lock | v3.0 | 0/? | Not started | - |
+| 17. User Cloud Folders | v3.0 | 0/? | Not started | - |

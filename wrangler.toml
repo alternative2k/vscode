@@ -1,0 +1,7 @@
+name = "formcheck"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "SETTINGS_KV"
+id = "YOUR_KV_NAMESPACE_ID"
+preview_id = "YOUR_KV_NAMESPACE_ID"

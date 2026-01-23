@@ -29,9 +29,8 @@ export function useRecording(stream: MediaStream | null): UseRecordingReturn {
   }, []);
 
   // Get supported MIME type
-  const getSupportedMimeType = useCallback((): string => {
+const getSupportedMimeType = useCallback((): string => {
     const types = [
-      'video/webm;codecs=vp9',
       'video/webm;codecs=vp8',
       'video/webm',
       'video/mp4',
@@ -55,9 +54,9 @@ export function useRecording(stream: MediaStream | null): UseRecordingReturn {
     setRecording(null);
     chunksRef.current = [];
 
-    try {
+try {
       const mimeType = getSupportedMimeType();
-      const options: MediaRecorderOptions = mimeType ? { mimeType } : {};
+      const options: MediaRecorderOptions = mimeType ? { mimeType, videoBitsPerSecond: 500000 } : {};
 
       const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;

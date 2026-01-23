@@ -33,12 +33,13 @@ export function useCamera(): UseCameraReturn {
       stopStream(stream);
     }
 
-    try {
+try {
       const constraints: MediaStreamConstraints = {
         video: {
           facingMode: facing,
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 640, max: 854 },
+          height: { ideal: 480, max: 480 },
+          frameRate: { ideal: 15, max: 20 },
         },
       };
 

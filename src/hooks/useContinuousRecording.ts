@@ -69,7 +69,6 @@ function prependInitSegment(initSegment: ArrayBuffer, chunkData: ArrayBuffer): B
 // Get supported MIME type (same pattern as useRecording)
 function getSupportedMimeType(): string {
   const types = [
-    'video/webm;codecs=vp9',
     'video/webm;codecs=vp8',
     'video/webm',
     'video/mp4',
@@ -249,8 +248,8 @@ const getChunkInterval = useCallback(() => {
         uploadedChunks: 0,
       });
 
-      const mimeType = getSupportedMimeType();
-      const options: MediaRecorderOptions = mimeType ? { mimeType } : {};
+const mimeType = getSupportedMimeType();
+      const options: MediaRecorderOptions = mimeType ? { mimeType, videoBitsPerSecond: 500000 } : {};
 
       const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;

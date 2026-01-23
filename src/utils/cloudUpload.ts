@@ -2,8 +2,48 @@ import type { CloudConfig, UploadProgress, UploadResult, PresignedUrlResponse } 
 
 const CLOUD_CONFIG_KEY = 'formcheck-cloud-config';
 
+const uploadQueue: Array<{ blob: Blob, fileName: string, onProgress?: (progress: UploadProgress) => void, resolve: (result: UploadResult) => void }> = [];
+let isBatchUploading = false;
+let batchTimer: ReturnType<typeof setTimeout> | null = null;
+
+async function processBatchUpload(): Promise<void> {
+  if (isBatchUploading || uploadQueue.length === 0) {
+    return;
+  }
+
+  isBatchUploading = true;
+
+  // Clear any pending batch timer
+  if (batchTimer) {
+    clearTimeout(batchTimer);
+    batchTimer = null;
+  }
+
+  // Process up to 5 items at once
+  const batchSize = 5;
+  const batch = uploadQueue.splice(0, batchSize);
+
+  const results = await Promise.all(
+    batch.map(({ blob, fileName, onProgress }) =>
+      uploadToCloud(blob, fileName, onProgress)
+    )
+  );
+
+  // Resolve all promises with their results
+  batch.forEach((item, index) => {
+    item.resolve(results[index]);
+  });
+
+  isBatchUploading = false;
+
+  // Process remaining items if any
+  if (uploadQueue.length > 0) {
+    batchTimer = window.setTimeout(processBatchUpload, 100);
+  }
+}
+
 /**
- * Saves cloud configuration to localStorage.
+ * Returns today's date as YYYY-MM-DD for folder organization.
  */
 export function saveCloudConfig(config: CloudConfig): void {
   localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(config));
@@ -70,7 +110,14 @@ export async function uploadChunk(
   const dateFolder = getDateFolder();
   const userPrefix = userId ? `${userId}/` : '';
   const fileName = `${userPrefix}${dateFolder}/${sessionId}/chunk-${String(chunkIndex).padStart(4, '0')}.webm`;
-  return uploadToCloud(blob, fileName, onProgress);
+  
+  // Add to queue for batch processing
+  return new Promise((resolve) => {
+    uploadQueue.push({ blob, fileName, onProgress, resolve });
+    if (!batchTimer) {
+      batchTimer = window.setTimeout(processBatchUpload, 500);
+    }
+  });
 }
 
 /**
@@ -153,6 +200,10 @@ function attemptUpload(
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
 
+    // Adaptive timeout based on file size
+    const fileSizeInMB = blob.size / (1024 * 1024);
+    const adaptiveTimeout = Math.max(60000, fileSizeInMB * 10000); // Min 60s, otherwise size-based
+
     // Track upload progress
     xhr.upload.addEventListener('progress', (event) => {
       if (event.lengthComputable && onProgress) {
@@ -191,7 +242,7 @@ function attemptUpload(
     // Configure and send request
     xhr.open('PUT', url, true);
     xhr.setRequestHeader('Content-Type', blob.type || 'video/webm');
-    xhr.timeout = 300000; // 5 minute timeout for large files
+    xhr.timeout = adaptiveTimeout;
     xhr.send(blob);
   });
 }

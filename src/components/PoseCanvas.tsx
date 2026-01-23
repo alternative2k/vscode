@@ -27,10 +27,18 @@ const VISIBILITY_THRESHOLD = 0.5;
 
 export function PoseCanvas({ landmarks, width, height, highlightLandmarks, highlightSeverity }: PoseCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const lastDrawTimestamp = useRef(0);
+  const DRAW_THROTTLE = 33; // Limit canvas updates to ~30fps
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const now = Date.now();
+    if (now - lastDrawTimestamp.current < DRAW_THROTTLE) {
+      return;
+    }
+    lastDrawTimestamp.current = now;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;

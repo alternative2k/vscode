@@ -18,6 +18,8 @@ export function usePoseDetection(
   const [pose, setPose] = useState<Pose | null>(null);
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const lastProcessTimeRef = useRef(0);
+  const PROCESSING_INTERVAL = 66;
 
   // Store facingMode in a ref to avoid recreating pose instance
   const facingModeRef = useRef(facingMode);
@@ -93,14 +95,26 @@ export function usePoseDetection(
 
     let isRunning = true;
 
-    const detectPose = async () => {
+const detectPose = async () => {
       if (!isRunning || !videoElement || !pose) {
+        return;
+      }
+
+      const now = Date.now();
+      const timeSinceLastProcess = now - lastProcessTimeRef.current;
+
+      // Rate limit pose detection on mobile devices
+      if (timeSinceLastProcess < PROCESSING_INTERVAL) {
+        if (isRunning) {
+          animationFrameRef.current = requestAnimationFrame(detectPose);
+        }
         return;
       }
 
       // Check if video is ready (readyState >= 2 means HAVE_CURRENT_DATA)
       if (videoElement.readyState >= 2) {
         setIsDetecting(true);
+        lastProcessTimeRef.current = now;
         try {
           await pose.send({ image: videoElement });
         } catch (error) {

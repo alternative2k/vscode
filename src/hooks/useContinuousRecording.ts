@@ -97,6 +97,19 @@ export function useContinuousRecording(
   const [hasRetries, setHasRetries] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Detect low-end devices for performance optimization
+  const [isLowEndDevice, setIsLowEndDevice] = useState(false);
+  
+  useEffect(() => {
+    const checkDeviceCapability = () => {
+      // Detect low-end devices based on CPU cores and memory
+      const cores = navigator.hardwareConcurrency || 4;
+      const memory = (navigator as any).deviceMemory || 4;
+      setIsLowEndDevice(cores < 4 || memory < 4);
+    };
+    checkDeviceCapability();
+  }, []);
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const startTimeRef = useRef<number>(0);
   const durationIntervalRef = useRef<number | null>(null);
@@ -123,8 +136,13 @@ export function useContinuousRecording(
     }
   }, [options?.autoStart]);
 
-  // Maximum retry attempts per chunk
+// Maximum retry attempts per chunk
   const MAX_RETRIES = 5;
+
+  // Adaptive chunk size based on device capability
+const getChunkInterval = useCallback(() => {
+    return isLowEndDevice ? 10000 : 5000; // 10s on low-end, 5s on high-end
+  }, [isLowEndDevice]);
 
   // Upload pending chunks for a session with retry logic
   const uploadPendingChunks = useCallback(async (forSessionId: string) => {

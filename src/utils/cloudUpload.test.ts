@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import type { CloudConfig } from './cloudUpload';
+import type { CloudConfig } from '../types/cloud';
 import {
   saveCloudConfig,
   getCloudConfig,
@@ -8,23 +8,25 @@ import {
 
 describe('cloudUpload', () => {
   beforeEach(() => {
-    localStorage.clear();
+    sessionStorage.clear();
   });
 
   afterEach(() => {
-    localStorage.clear();
+    sessionStorage.clear();
   });
 
   it('saves and retrieves cloud config', () => {
     const config: CloudConfig = {
-      accountId: 'test-account',
-      bucketName: 'test-bucket',
+      enabled: true,
     };
 
     saveCloudConfig(config);
     const retrieved = getCloudConfig();
 
-    expect(retrieved).toEqual(config);
+    if (!retrieved) {
+      throw new Error(`Config should not be null. sessionStorage has: ${sessionStorage.getItem('formcheck-cloud-config')}`);
+    }
+    expect(retrieved.enabled).toBe(true);
   });
 
   it('returns null when no config exists', () => {
@@ -34,8 +36,7 @@ describe('cloudUpload', () => {
 
   it('clears saved config', () => {
     const config: CloudConfig = {
-      accountId: 'test-account',
-      bucketName: 'test-bucket',
+      enabled: true,
     };
 
     saveCloudConfig(config);
@@ -46,7 +47,7 @@ describe('cloudUpload', () => {
   });
 
   it('handles malformed config gracefully', () => {
-    localStorage.setItem('formcheck-cloud-config', 'invalid-json');
+    sessionStorage.setItem('formcheck-cloud-config', 'invalid-json');
     const config = getCloudConfig();
     expect(config).toBeNull();
   });

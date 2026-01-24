@@ -1,8 +1,31 @@
 import type { CloudConfig, UploadProgress, UploadResult, PresignedUrlResponse } from '../types/cloud';
+import {
+  getDateFolder as getDateFolderUtil,
+  uploadWithRetry,
+  getAdaptiveTimeout,
+  attemptUpload,
+  createSecureStorage,
+} from './uploadUtils';
 
 const CLOUD_CONFIG_KEY = 'formcheck-cloud-config';
+const BATCH_SIZE = 5;
+const BATCH_DELAY_MS = 100;
+const INITIAL_BATCH_DELAY_MS = 500;
 
-const uploadQueue: Array<{ blob: Blob, fileName: string, onProgress?: (progress: UploadProgress) => void, resolve: (result: UploadResult) => void }> = [];
+export const {
+  save: saveCloudConfig,
+  get: getCloudConfig,
+  clear: clearCloudConfig,
+} = createSecureStorage<CloudConfig>(CLOUD_CONFIG_KEY);
+
+interface QueuedUpload {
+  blob: Blob;
+  fileName: string;
+  onProgress?: (progress: UploadProgress) => void;
+  resolve: (result: UploadResult) => void;
+}
+
+const uploadQueue: QueuedUpload[] = [];
 let isBatchUploading = false;
 let batchTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -13,15 +36,12 @@ async function processBatchUpload(): Promise<void> {
 
   isBatchUploading = true;
 
-  // Clear any pending batch timer
   if (batchTimer) {
     clearTimeout(batchTimer);
     batchTimer = null;
   }
 
-  // Process up to 5 items at once
-  const batchSize = 5;
-  const batch = uploadQueue.splice(0, batchSize);
+  const batch = uploadQueue.splice(0, BATCH_SIZE);
 
   const results = await Promise.all(
     batch.map(({ blob, fileName, onProgress }) =>
@@ -29,77 +49,17 @@ async function processBatchUpload(): Promise<void> {
     )
   );
 
-  // Resolve all promises with their results
   batch.forEach((item, index) => {
     item.resolve(results[index]);
   });
 
   isBatchUploading = false;
 
-  // Process remaining items if any
   if (uploadQueue.length > 0) {
-    batchTimer = window.setTimeout(processBatchUpload, 100);
+    batchTimer = window.setTimeout(processBatchUpload, BATCH_DELAY_MS);
   }
 }
 
-/**
- * Returns today's date as YYYY-MM-DD for folder organization.
- */
-export function saveCloudConfig(config: CloudConfig): void {
-  localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(config));
-}
-
-/**
- * Retrieves cloud configuration from localStorage.
- * Returns null if not configured.
- */
-export function getCloudConfig(): CloudConfig | null {
-  const stored = localStorage.getItem(CLOUD_CONFIG_KEY);
-  if (!stored) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(stored) as CloudConfig;
-  } catch {
-    console.error('Failed to parse cloud config from localStorage');
-    return null;
-  }
-}
-
-/**
- * Clears cloud configuration from localStorage.
- */
-export function clearCloudConfig(): void {
-  localStorage.removeItem(CLOUD_CONFIG_KEY);
-}
-
-/**
- * Delays execution for a specified number of milliseconds.
- */
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/**
- * Returns today's date as YYYY-MM-DD for folder organization.
- */
-function getDateFolder(): string {
-  const now = new Date();
-  return now.toISOString().split('T')[0]; // Returns "2026-01-21"
-}
-
-/**
- * Uploads a chunk blob with session context in the filename.
- * Organizes chunks in folders by session ID on R2.
- *
- * @param blob - The chunk blob to upload
- * @param sessionId - The continuous recording session ID
- * @param chunkIndex - The index of this chunk in the session
- * @param userId - Optional user ID for per-user folder organization
- * @param onProgress - Optional callback for progress updates
- * @returns Promise resolving to upload result
- */
 export async function uploadChunk(
   blob: Blob,
   sessionId: string,
@@ -107,44 +67,24 @@ export async function uploadChunk(
   userId?: string,
   onProgress?: (progress: UploadProgress) => void
 ): Promise<UploadResult> {
-  const dateFolder = getDateFolder();
+  const dateFolder = getDateFolderUtil();
   const userPrefix = userId ? `${userId}/` : '';
   const fileName = `${userPrefix}${dateFolder}/${sessionId}/chunk-${String(chunkIndex).padStart(4, '0')}.webm`;
-  
-  // Add to queue for batch processing
+
   return new Promise((resolve) => {
     uploadQueue.push({ blob, fileName, onProgress, resolve });
     if (!batchTimer) {
-      batchTimer = window.setTimeout(processBatchUpload, 500);
+      batchTimer = window.setTimeout(processBatchUpload, INITIAL_BATCH_DELAY_MS);
     }
   });
 }
 
-/**
- * Uploads a blob to R2 using presigned URLs.
- *
- * Two-step process:
- * 1. Fetch presigned URL from Pages Function (/api/upload-url)
- * 2. Upload directly to R2 using the presigned URL
- *
- * Implements retry logic with exponential backoff (1s, 2s, 4s).
- *
- * @param blob - The blob to upload
- * @param fileName - The file name for the upload
- * @param onProgress - Optional callback for progress updates
- * @returns Promise resolving to upload result
- */
 export async function uploadToCloud(
   blob: Blob,
   fileName: string,
   onProgress?: (progress: UploadProgress) => void
 ): Promise<UploadResult> {
-  const maxRetries = 3;
-  const backoffDelays = [1000, 2000, 4000]; // 1s, 2s, 4s
-
-  // Step 1: Get presigned URL from Pages Function
-  let presignedResponse: PresignedUrlResponse;
-  try {
+  const fetchPresignedUrl = async (): Promise<PresignedUrlResponse> => {
     const response = await fetch('/api/upload-url', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -157,92 +97,28 @@ export async function uploadToCloud(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       const errorMessage = (errorData as { error?: string }).error || `Failed to get upload URL: ${response.status}`;
-      return { success: false, error: errorMessage };
+      throw new Error(errorMessage);
     }
 
-    presignedResponse = await response.json() as PresignedUrlResponse;
+    return (await response.json()) as PresignedUrlResponse;
+  };
+
+  try {
+    const presignedResponse = await fetchPresignedUrl();
+
+    return await uploadWithRetry(async () => {
+      const timeoutMs = getAdaptiveTimeout(blob, 60000);
+      const result = await attemptUpload({
+        blob,
+        url: presignedResponse.uploadUrl,
+        onProgress,
+        timeoutMs,
+        contentType: blob.type || 'video/webm',
+      });
+      return { ...result, url: presignedResponse.objectKey };
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to get upload URL';
     return { success: false, error: message };
   }
-
-  // Step 2: Upload to R2 using presigned URL with retry logic
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      const result = await attemptUpload(blob, presignedResponse.uploadUrl, onProgress);
-      // Return with the object key for reference
-      return { ...result, url: presignedResponse.objectKey };
-    } catch (error) {
-      const isLastAttempt = attempt === maxRetries - 1;
-
-      if (isLastAttempt) {
-        const message = error instanceof Error ? error.message : 'Upload failed';
-        return { success: false, error: message };
-      }
-
-      // Wait before retrying
-      await delay(backoffDelays[attempt]);
-    }
-  }
-
-  // Should never reach here, but TypeScript needs a return
-  return { success: false, error: 'Upload failed after retries' };
-}
-
-/**
- * Attempts a single upload using XMLHttpRequest.
- */
-function attemptUpload(
-  blob: Blob,
-  url: string,
-  onProgress?: (progress: UploadProgress) => void
-): Promise<UploadResult> {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-
-    // Adaptive timeout based on file size
-    const fileSizeInMB = blob.size / (1024 * 1024);
-    const adaptiveTimeout = Math.max(60000, fileSizeInMB * 10000); // Min 60s, otherwise size-based
-
-    // Track upload progress
-    xhr.upload.addEventListener('progress', (event) => {
-      if (event.lengthComputable && onProgress) {
-        onProgress({
-          loaded: event.loaded,
-          total: event.total,
-          percentage: Math.round((event.loaded / event.total) * 100),
-        });
-      }
-    });
-
-    // Handle completion
-    xhr.addEventListener('load', () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve({ success: true, url });
-      } else {
-        reject(new Error(`Upload failed with status ${xhr.status}: ${xhr.statusText}`));
-      }
-    });
-
-    // Handle network errors
-    xhr.addEventListener('error', () => {
-      reject(new Error('Network error during upload'));
-    });
-
-    // Handle timeout
-    xhr.addEventListener('timeout', () => {
-      reject(new Error('Upload timed out'));
-    });
-
-    // Handle abort
-    xhr.addEventListener('abort', () => {
-      reject(new Error('Upload aborted'));
-    });
-
-    // Configure and send request
-    xhr.open('PUT', url, true);
-    xhr.setRequestHeader('Content-Type', blob.type || 'video/webm');
-    xhr.timeout = adaptiveTimeout;
-    xhr.send(blob);
-  });
 }

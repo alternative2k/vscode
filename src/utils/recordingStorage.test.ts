@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import type { SavedRecording } from './recordingStorage';
+import { describe, it, expect, beforeEach } from 'vitest';
+import type { SavedRecording } from '../types/recording';
 import {
   saveRecording,
   getAllRecordings,
@@ -19,10 +19,10 @@ describe('recordingStorage', () => {
 
   it('saves and retrieves recording', async () => {
     const recording: SavedRecording = {
-      file: new Blob(['test'], { type: 'video/webm' }),
-      url: 'blob:test',
+      blob: new Blob(['test'], { type: 'video/webm' }),
       timestamp: new Date(),
       duration: 10,
+      fileSize: 4,
     };
 
     const id = await saveRecording(recording);
@@ -36,17 +36,17 @@ describe('recordingStorage', () => {
     const now = Date.now();
 
     await saveRecording({
-      file: new Blob(['test1'], { type: 'video/webm' }),
-      url: 'blob:test1',
+      blob: new Blob(['test1'], { type: 'video/webm' }),
       timestamp: new Date(now - 1000),
       duration: 5,
+      fileSize: 4,
     });
 
     await saveRecording({
-      file: new Blob(['test2'], { type: 'video/webm' }),
-      url: 'blob:test2',
+      blob: new Blob(['test2'], { type: 'video/webm' }),
       timestamp: new Date(now),
       duration: 10,
+      fileSize: 4,
     });
 
     const recordings = await getAllRecordings();
@@ -58,10 +58,10 @@ describe('recordingStorage', () => {
 
   it('deletes recording', async () => {
     const recording: SavedRecording = {
-      file: new Blob(['test'], { type: 'video/webm' }),
-      url: 'blob:test',
+      blob: new Blob(['test'], { type: 'video/webm' }),
       timestamp: new Date(),
       duration: 10,
+      fileSize: 4,
     };
 
     const id = await saveRecording(recording);
@@ -75,7 +75,6 @@ describe('recordingStorage', () => {
     const blob = new Blob(['test'], { type: 'video/webm' });
     await saveRecording({
       blob,
-      url: 'blob:test',
       timestamp: new Date(),
       duration: 10,
       fileSize: blob.size,

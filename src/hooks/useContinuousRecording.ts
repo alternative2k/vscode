@@ -9,6 +9,7 @@ import {
   markChunkUploaded,
   getChunksBySession,
   updateChunk,
+  deleteChunk,
 } from '../utils/chunkStorage';
 import { uploadChunk } from '../utils/cloudUpload';
 
@@ -150,9 +151,11 @@ const [hasRetries, setHasRetries] = useState(false);
       let uploadedCount = 0;
       for (const chunk of pendingChunks) {
         try {
-          const result = await uploadChunk(chunk.blob, forSessionId, chunk.chunkIndex, options?.userId);
+const result = await uploadChunk(chunk.blob, forSessionId, chunk.chunkIndex, options?.userId);
           if (result.success && chunk.id !== undefined) {
             await markChunkUploaded(chunk.id);
+            // Delete chunk from local storage after successful upload to free space
+            await deleteChunk(chunk.id);
             uploadedCount++;
             setUploadProgress({ uploaded: uploadedCount, total: pendingChunks.length });
           } else if (chunk.id !== undefined) {

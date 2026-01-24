@@ -222,6 +222,33 @@ export async function markChunkUploaded(id: number): Promise<void> {
 }
 
 /**
+ * Deletes a specific chunk by id.
+ */
+export async function deleteChunk(id: number): Promise<void> {
+  const db = await openChunkDatabase();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(CHUNKS_STORE, 'readwrite');
+    const store = transaction.objectStore(CHUNKS_STORE);
+
+    const request = store.delete(id);
+
+    request.onerror = () => {
+      console.error('Failed to delete chunk:', request.error);
+      reject(request.error);
+    };
+
+    request.onsuccess = () => {
+      resolve();
+    };
+
+    transaction.oncomplete = () => {
+      db.close();
+    };
+  });
+}
+
+/**
  * Deletes all chunks for a session.
  */
 export async function deleteChunksBySession(sessionId: string): Promise<void> {

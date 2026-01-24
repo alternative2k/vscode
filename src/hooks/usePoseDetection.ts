@@ -117,7 +117,7 @@ const detectPose = async () => {
         lastProcessTimeRef.current = now;
         try {
           await pose.send({ image: videoElement });
-        } catch (error) {
+        } catch {
           // Silently handle errors during detection
           // This can happen during camera switching or unmounting
         }

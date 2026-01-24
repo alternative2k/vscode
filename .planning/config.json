@@ -22,5 +22,11 @@
   "safety": {
     "always_confirm_destructive": true,
     "always_confirm_external_services": true
+  },
+  "model_profile": "budget",
+  "workflow": {
+    "research": false,
+    "plan_check": true,
+    "verifier": true
   }
 }

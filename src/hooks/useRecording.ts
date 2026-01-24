@@ -135,7 +135,7 @@ try {
     };
   }, [cleanupObjectUrl]);
 
-  // Reset state if stream changes (e.g., camera switch)
+// Reset state if stream changes (e.g., camera switch)
   useEffect(() => {
     if (state === 'recording' && mediaRecorderRef.current) {
       // Stop recording if stream changes mid-recording
@@ -145,7 +145,7 @@ try {
     setState('idle');
     setDuration(0);
     // Keep the last recording available
-  }, [stream]);
+  }, [stream, state]);
 
   return {
     state,

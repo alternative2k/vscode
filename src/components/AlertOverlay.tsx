@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { ExerciseAlert } from '../hooks/useExerciseAlerts';
 
 interface AlertOverlayProps {
@@ -10,7 +11,7 @@ interface AlertOverlayProps {
  * - Warning (yellow): For form issues that should be corrected
  * - Error (red): For critical form problems that could cause injury
  */
-export function AlertOverlay({ alert }: AlertOverlayProps) {
+export const AlertOverlay = memo(function AlertOverlay({ alert }: AlertOverlayProps) {
   if (!alert) {
     return null;
   }
@@ -38,4 +39,10 @@ export function AlertOverlay({ alert }: AlertOverlayProps) {
       </div>
     </div>
   );
-}
+}, (prev, next) => {
+  // Optimization: Only re-render if the alert content actually changes
+  // This prevents re-renders when parent updates but alert is stable
+  if (prev.alert === next.alert) return true;
+  if (!prev.alert || !next.alert) return false;
+  return prev.alert.message === next.alert.message && prev.alert.severity === next.alert.severity;
+});

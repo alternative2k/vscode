@@ -349,28 +349,7 @@ const mimeType = getSupportedMimeType();
     }
   }, [isEnabled, stream, state, startRecording]);
 
-  // Handle visibility change - THE critical event for page exit
-  useEffect(() => {
-    const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'hidden') {
-        // User is leaving - stop recorder and upload
-        if (mediaRecorderRef.current?.state === 'recording') {
-          mediaRecorderRef.current.stop();
-          // onstop handler will trigger upload
-        }
-      } else if (document.visibilityState === 'visible') {
-        // User returned - start new session if still enabled
-        if (isEnabledRef.current && stream && !mediaRecorderRef.current?.state) {
-          startRecording();
-        }
-      }
-    };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [stream, startRecording]);
 
   // Reset when stream changes
   useEffect(() => {

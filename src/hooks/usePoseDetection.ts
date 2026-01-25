@@ -1,13 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Pose, Results } from '@mediapipe/pose';
 import { Landmark } from '../types/pose';
+import { PerformanceMonitor, PerformanceMetrics } from '../utils/performanceMonitor';
 
 type FacingMode = 'user' | 'environment';
 
 interface UsePoseDetectionReturn {
   landmarks: Landmark[] | null;
   isDetecting: boolean;
+  metrics: PerformanceMetrics | null;
 }
+
+const MONITORING_INTERVAL = 30000; // Update metrics every 30 seconds
 
 export function usePoseDetection(
   videoRef: React.RefObject<HTMLVideoElement | null>,
@@ -15,11 +19,13 @@ export function usePoseDetection(
 ): UsePoseDetectionReturn {
   const [landmarks, setLandmarks] = useState<Landmark[] | null>(null);
   const [isDetecting, setIsDetecting] = useState(false);
+  const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
   const [pose, setPose] = useState<Pose | null>(null);
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const lastProcessTimeRef = useRef(0);
   const PROCESSING_INTERVAL = 66;
+  const monitorRef = useRef<PerformanceMonitor>(new PerformanceMonitor());
 
   // Store facingMode in a ref to avoid recreating pose instance
   const facingModeRef = useRef(facingMode);
@@ -87,15 +93,34 @@ export function usePoseDetection(
     };
   }, [onResults]);
 
-  // Detection loop using requestAnimationFrame
+// Detection loop using requestAnimationFrame
   useEffect(() => {
     if (!videoElement || !pose) {
       return;
     }
 
     let isRunning = true;
+    const monitor = monitorRef.current;
 
-const detectPose = async () => {
+    // Start metrics update interval
+    const metricsInterval = setInterval(() => {
+      const currentMetrics = monitor.getMetrics();
+      setMetrics(currentMetrics);
+
+      if (typeof window !== 'undefined' && import.meta.env.DEV) {
+        import('../utils/performanceMonitor').then(({ evaluateWorkerNeed }) => {
+          const recommendation = evaluateWorkerNeed(currentMetrics);
+          if (recommendation.shouldUseWorker) {
+            console.warn('\n[PerformanceMonitor]');
+            console.warn('Recommendation:', recommendation.reason);
+            console.warn('Metrics:', currentMetrics);
+            console.warn('---\n');
+          }
+        });
+      }
+    }, MONITORING_INTERVAL);
+
+    const detectPose = async () => {
       if (!isRunning || !videoElement || !pose) {
         return;
       }
@@ -115,8 +140,16 @@ const detectPose = async () => {
       if (videoElement.readyState >= 2) {
         setIsDetecting(true);
         lastProcessTimeRef.current = now;
+
+        const processStart = performance.now();
         try {
           await pose.send({ image: videoElement });
+          const processEnd = performance.now();
+          const frameTime = processEnd - processStart;
+
+          monitor.recordFrameTime(frameTime);
+          monitor.recordBlockingTime(frameTime);
+          monitor.recordMemory();
         } catch {
           // Silently handle errors during detection
           // This can happen during camera switching or unmounting
@@ -135,6 +168,7 @@ const detectPose = async () => {
     return () => {
       isRunning = false;
       setIsDetecting(false);
+      clearInterval(metricsInterval);
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
@@ -145,5 +179,6 @@ const detectPose = async () => {
   return {
     landmarks,
     isDetecting,
+    metrics,
   };
 }

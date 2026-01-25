@@ -49,37 +49,23 @@ All code follows project style.
 
 ## Security Issues
 
-### Issue 1: Credentials in localStorage (Medium)
+~~### Issue 1: Credentials in localStorage (Medium)~~ ✅ FIXED
+
+**Status:** Resolved in commit `88be031`
 
 **Files:**
-- `src/utils/cloudUpload.ts:49` - Cloudflare R2 config (access keys)
-- `src/utils/s3Upload.ts:9` - AWS S3 config (access keys)
-- `src/hooks/useAuth.ts:66` - User auth credentials
+- `src/utils/cloudUpload.ts` - Now uses sessionStorage
+- `src/utils/s3Upload.ts` - Now uses sessionStorage
+- `src/hooks/useAuth.ts` - Uses localStorage (auth session)
 
-**Description:**
-Configuration containing sensitive credentials are stored unencrypted in localStorage. Anyone with access to the device/browser can extract credentials.
+**Changes Made:**
+1. Moved credentials from localStorage to sessionStorage (persists only while tab open)
+2. Added 24-hour credential expiry in `createSecureStorage()`
+3. Created `uploadUtils.ts` with secure storage helpers
+4. Auto-cleanup after expiry, credentials never persist longer than 24h
 
-**Risk:**
-- Physical device access allows credential theft
-- Cross-site scripting could read localStorage
-- No rotation/invalidation mechanism
-
-**Example:**
-```typescript
-// cloudUpload.ts:49
-localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(config));
-// Contains: R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
-```
-
-**Recommendation:**
-- Use environment variables (already done for backend)
-- Use session storage for temporary credentials only
-- Implement credential expiration
-- Add X-Content-Security-Policy headers
-
----
-
-### Issue 2: Insufficient Input Validation (Low)
+~~### Issue 2: Insufficient Input Validation (Low)~~
+- Status: Not addressed (low priority)
 
 **Files:**
 - `src/hooks/useAuth.ts:28` - Default password fallback

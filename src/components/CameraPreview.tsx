@@ -15,6 +15,7 @@ import { RecordingControls } from './RecordingControls';
 import { RecordingList } from './RecordingList';
 import { CloudConfigModal } from './CloudConfigModal';
 import { ContinuousRecordingStatus } from './ContinuousRecordingStatus';
+import { PerformanceDisplay } from './PerformanceDisplay';
 
 // Detect if running on a mobile device
 function isMobileDevice(): boolean {
@@ -35,7 +36,7 @@ function getOrientation(): 'portrait' | 'landscape' {
 
 export function CameraPreview() {
   const { stream, error, isLoading, videoRef, facingMode, toggleCamera } = useCamera();
-  const { landmarks, isDetecting } = usePoseDetection(videoRef, facingMode);
+  const { landmarks, isDetecting, metrics } = usePoseDetection(videoRef, facingMode);
   const { isFullscreen, toggleFullscreen, isSupported: fullscreenSupported } = useFullscreen();
   const { user } = useAuth();
 
@@ -275,9 +276,11 @@ export function CameraPreview() {
     );
   }
 
-  // Video preview with skeleton overlay and camera switch button
+// Video preview with skeleton overlay and camera switch button
   return (
     <div className="relative w-full h-[70vh] md:h-auto md:aspect-video bg-gray-900 rounded-lg overflow-hidden">
+      <PerformanceDisplay metrics={metrics} />
+
       <video
         ref={videoRef}
         autoPlay
